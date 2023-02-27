@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+const Button = ({ handleClick, text }) => (
+    <button onClick={handleClick}> {text} </button>
+);
+
 const App = () => {
     const anecdotes = [
         "If it hurts, do it more often.",
@@ -15,29 +19,40 @@ const App = () => {
     const [votes, setVotes] = useState(Array(anecdotes.length).fill(0));
     const [selected, setSelected] = useState(0);
 
+    const maxIndex = (arr) => {
+        let current = 0;
+        arr.forEach((e, i) => (current = e > arr[current] ? i : current));
+
+        return current;
+    };
+
     return (
         <>
+            <h1>Anecdote of the day</h1>
+
             <div>{anecdotes[selected]}</div>
             <div>has {votes[selected]} votes</div>
 
-            <button
-                onClick={() => {
+            <Button
+                handleClick={() => {
                     let newVotes = [...votes];
                     ++newVotes[selected];
 
                     setVotes(newVotes);
                 }}
-            >
-                vote
-            </button>
+                text={"vote"}
+            />
 
-            <button
-                onClick={() =>
+            <Button
+                handleClick={() =>
                     setSelected(Math.floor(Math.random() * anecdotes.length))
                 }
-            >
-                next anecdote
-            </button>
+                text={"next anecdote"}
+            />
+
+            <h1>Anecdote with the most votes</h1>
+
+            <div>{anecdotes[maxIndex(votes)]}</div>
         </>
     );
 };
