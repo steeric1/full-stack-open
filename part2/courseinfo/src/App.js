@@ -28,9 +28,10 @@ const Course = ({ course }) => {
             <Header course={name} />
             <Content parts={parts} />
             <Total
-                sum={
-                    parts[0].exercises + parts[1].exercises + parts[2].exercises
-                }
+                sum={parts.reduce(
+                    (previous, current) => previous + current.exercises,
+                    0
+                )}
             />
         </>
     );
