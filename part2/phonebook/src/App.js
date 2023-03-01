@@ -60,11 +60,33 @@ const App = () => {
     }, []);
 
     const addPerson = () => {
-        if (persons.find((person) => person.name === newName)) {
-            alert(`${newName} is already added to phonebook`);
+        // If a person with the given name already exists, prompt to update the number
+        let old = persons.find((person) => person.name === newName);
+        if (
+            old &&
+            window.confirm(
+                `${newName} is already added to phonebook, update the number?`
+            )
+        ) {
+            personService
+                .update(old.id, { ...old, number: newNumber })
+                .then((returnedPerson) => {
+                    setPersons(
+                        persons.map((person) =>
+                            person.id === returnedPerson.id
+                                ? returnedPerson
+                                : person
+                        )
+                    );
+
+                    setNewName("");
+                    setNewNumber("");
+                });
+
             return;
         }
 
+        // Generate an id that doesn't already exist
         let id = persons.length + 1;
         while (persons.find((person) => person.id === id)) {
             ++id;
@@ -86,18 +108,16 @@ const App = () => {
 
     const removePerson = (id) => {
         if (
-            !window.confirm(
+            window.confirm(
                 `Are you certain you want to remove ${
                     persons.find((person) => person.id === id).name
                 }?`
             )
         ) {
-            return;
+            personService.remove(id).then(() => {
+                setPersons(persons.filter((person) => person.id !== id));
+            });
         }
-
-        personService.remove(id).then(() => {
-            setPersons(persons.filter((person) => person.id !== id));
-        });
     };
 
     let personsToShow = persons.filter((person) =>
