@@ -45,6 +45,13 @@ const Persons = ({ persons, removePerson }) => (
     </>
 );
 
+const Notification = ({ message, isError }) =>
+    message && (
+        <div className={`notification ${isError ? "error" : ""}`}>
+            {message}
+        </div>
+    );
+
 const App = () => {
     const [persons, setPersons] = useState([]);
 
@@ -53,11 +60,24 @@ const App = () => {
     const [newName, setNewName] = useState("");
     const [newNumber, setNewNumber] = useState("");
 
+    const [notification, setNotification] = useState({
+        message: "",
+        isError: false,
+    });
+
     useEffect(() => {
         personService
             .getAll()
             .then((initialPersons) => setPersons(initialPersons));
     }, []);
+
+    const notifyUser = (message, isError = false) => {
+        setNotification({ message, isError });
+
+        setTimeout(() => {
+            setNotification({ message: "", isError: false });
+        }, 4000);
+    };
 
     const addPerson = () => {
         // If a person with the given name already exists, prompt to update the number
@@ -78,6 +98,8 @@ const App = () => {
                                 : person
                         )
                     );
+
+                    notifyUser(`Successfully updated number for ${old.name}!`);
 
                     setNewName("");
                     setNewNumber("");
@@ -101,20 +123,21 @@ const App = () => {
         personService.create(newPerson).then((returnedPerson) => {
             setPersons([...persons, returnedPerson]);
 
+            notifyUser(`Successfully added ${returnedPerson.name}!`);
+
             setNewName("");
             setNewNumber("");
         });
     };
 
     const removePerson = (id) => {
+        let person = persons.find((person) => person.id === id);
         if (
-            window.confirm(
-                `Are you certain you want to remove ${
-                    persons.find((person) => person.id === id).name
-                }?`
-            )
+            window.confirm(`Are you certain you want to remove ${person.name}?`)
         ) {
             personService.remove(id).then(() => {
+                notifyUser(`Successfully removed ${person.name}!`);
+
                 setPersons(persons.filter((person) => person.id !== id));
             });
         }
@@ -127,6 +150,11 @@ const App = () => {
     return (
         <>
             <h2>Phonebook</h2>
+
+            <Notification
+                message={notification.message}
+                isError={notification.isError}
+            />
 
             <NameFilter
                 filterText={nameFilterText}
