@@ -34,11 +34,12 @@ const PersonForm = ({ handleSubmit, fields }) => (
     </form>
 );
 
-const Persons = ({ persons }) => (
+const Persons = ({ persons, removePerson }) => (
     <>
         {persons.map((person) => (
-            <p key={person.name}>
-                {person.name} {person.number}
+            <p key={person.id}>
+                {person.name} {person.number}{" "}
+                <button onClick={() => removePerson(person.id)}>remove</button>
             </p>
         ))}
     </>
@@ -64,10 +65,15 @@ const App = () => {
             return;
         }
 
+        let id = persons.length + 1;
+        while (persons.find((person) => person.id === id)) {
+            ++id;
+        }
+
         const newPerson = {
             name: newName,
             number: newNumber,
-            id: persons.length + 1,
+            id,
         };
 
         personService.create(newPerson).then((returnedPerson) => {
@@ -75,6 +81,22 @@ const App = () => {
 
             setNewName("");
             setNewNumber("");
+        });
+    };
+
+    const removePerson = (id) => {
+        if (
+            !window.confirm(
+                `Are you certain you want to remove ${
+                    persons.find((person) => person.id === id).name
+                }?`
+            )
+        ) {
+            return;
+        }
+
+        personService.remove(id).then(() => {
+            setPersons(persons.filter((person) => person.id !== id));
         });
     };
 
@@ -107,7 +129,7 @@ const App = () => {
 
             <h3>Persons</h3>
 
-            <Persons persons={personsToShow} />
+            <Persons persons={personsToShow} removePerson={removePerson} />
         </>
     );
 };

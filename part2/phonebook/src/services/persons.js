@@ -8,6 +8,8 @@ const getAll = () => getData(axios.get(baseUrl));
 
 const create = (newObject) => getData(axios.post(baseUrl, newObject));
 
-const exportedObject = { getAll, create };
+const remove = (id) => axios.delete(`${baseUrl}/${id}`);
+
+const exportedObject = { getAll, create, remove };
 
 export default exportedObject;
