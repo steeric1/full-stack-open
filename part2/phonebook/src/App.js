@@ -62,11 +62,20 @@ const App = () => {
             return;
         }
 
-        const newPerson = { name: newName, number: newNumber };
-        setPersons([...persons, newPerson]);
+        const newPerson = {
+            name: newName,
+            number: newNumber,
+            id: persons.length + 1,
+        };
 
-        setNewName("");
-        setNewNumber("");
+        axios
+            .post("http://localhost:3001/persons", newPerson)
+            .then((response) => {
+                setPersons([...persons, response.data]);
+
+                setNewName("");
+                setNewNumber("");
+            });
     };
 
     let personsToShow = persons.filter((person) =>
