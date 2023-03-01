@@ -100,7 +100,20 @@ const App = () => {
                     );
 
                     notifyUser(`Successfully updated number for ${old.name}!`);
+                })
+                .catch((error) => {
+                    setPersons(
+                        persons.filter((person) => person.id !== old.id)
+                    );
 
+                    notifyUser(
+                        error.response.status === 404
+                            ? `${newName} was already removed from the server`
+                            : "An unknown error occurred",
+                        true
+                    );
+                })
+                .finally(() => {
                     setNewName("");
                     setNewNumber("");
                 });
@@ -135,11 +148,22 @@ const App = () => {
         if (
             window.confirm(`Are you certain you want to remove ${person.name}?`)
         ) {
-            personService.remove(id).then(() => {
-                notifyUser(`Successfully removed ${person.name}!`);
-
-                setPersons(persons.filter((person) => person.id !== id));
-            });
+            personService
+                .remove(id)
+                .then(() => {
+                    notifyUser(`Successfully removed ${person.name}!`);
+                })
+                .catch((error) => {
+                    notifyUser(
+                        error.response.status === 404
+                            ? `${person.name} was already removed from the server`
+                            : "An unknown error occurred",
+                        true
+                    );
+                })
+                .finally(() =>
+                    setPersons(persons.filter((person) => person.id !== id))
+                );
         }
     };
 
