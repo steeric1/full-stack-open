@@ -1,0 +1,7 @@
+POST https://phonebook-backend-steeric.fly.dev/api/persons
+Content-Type: application/json
+
+{
+    "name": "Foo",
+    "number": "foo"
+}

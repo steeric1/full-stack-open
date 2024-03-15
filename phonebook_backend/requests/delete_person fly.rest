@@ -1,0 +1,1 @@
+DELETE https://phonebook-backend-steeric.fly.dev/api/persons/3
