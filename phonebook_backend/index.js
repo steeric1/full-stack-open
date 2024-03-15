@@ -26,8 +26,15 @@ const persons = [
 
 app.use(express.json());
 
-app.get("/api/persons", (req, res) => {
+app.get("/api/persons", (_, res) => {
     res.json(persons);
+});
+
+app.get("/info", (_, res) => {
+    res.send(`
+        <p>Phonebook has info for ${persons.length} people</p>
+        <p>${new Date()}</p>
+    `);
 });
 
 const PORT = 3001;
