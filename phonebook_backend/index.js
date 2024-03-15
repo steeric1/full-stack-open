@@ -51,6 +51,16 @@ app.delete("/api/persons/:id", (req, res) => {
 app.post("/api/persons", (req, res) => {
     const { name, number } = req.body;
 
+    if (!name || !number) {
+        return res.status(400).json({
+            error: "missing field(s), name and number must be provided",
+        });
+    } else if (persons.find((p) => p.name === name)) {
+        return res.status(400).json({
+            error: "name must be unique",
+        });
+    }
+
     const person = {
         id: Math.floor(Math.random() * 1e15),
         name,
