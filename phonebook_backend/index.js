@@ -45,9 +45,22 @@ app.delete("/api/persons/:id", (req, res) => {
     const id = Number(req.params.id);
     persons = persons.filter((p) => p.id !== id);
 
-    console.log(persons);
-
     res.status(204).end();
+});
+
+app.post("/api/persons", (req, res) => {
+    const { name, number } = req.body;
+
+    const person = {
+        id: Math.floor(Math.random() * 1e15),
+        name,
+        number,
+    };
+
+    persons.push(person);
+
+    res.json(person);
+    res.status(201).end();
 });
 
 app.get("/info", (_, res) => {
