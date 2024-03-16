@@ -72,14 +72,7 @@ app.delete("/api/persons/:id", (req, res, next) => {
 app.post("/api/persons", (req, res, next) => {
     const { name, number } = req.body;
 
-    if (!name || !number) {
-        return res.status(400).json({
-            error: "missing field(s), name and number must be provided",
-        });
-    }
-
     const person = new Person({
-        id: Math.floor(Math.random() * 1e15),
         name,
         number,
     });
@@ -96,12 +89,11 @@ app.put("/api/persons/:id", (req, res, next) => {
     const id = req.params.id;
     const { name, number } = req.body;
 
-    const updated = {
-        name,
-        number,
-    };
-
-    Person.findByIdAndUpdate(id, updated, { new: true })
+    Person.findByIdAndUpdate(
+        id,
+        { name, number },
+        { new: true, runValidators: true, context: "query" }
+    )
         .then((updated) => {
             if (updated) {
                 res.json(updated);
@@ -130,6 +122,8 @@ const errorHandler = (error, _, res, next) => {
 
     if (error.name === "CastError") {
         return res.status(400).send({ error: "malformed id" });
+    } else if (error.name === "ValidationError") {
+        return res.status(400).send({ error: error.message });
     }
 
     next(error);

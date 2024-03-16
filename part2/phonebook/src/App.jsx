@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-
 import personService from "./services/persons";
+import "./styles.css";
 
 const NameFilter = ({ filterText, handleTextChange }) => (
     <>
@@ -109,7 +108,7 @@ const App = () => {
                     notifyUser(
                         error.response.status === 404
                             ? `${newName} was already removed from the server`
-                            : "An unknown error occurred",
+                            : error.response.data.error,
                         true
                     );
                 })
@@ -133,14 +132,18 @@ const App = () => {
             id,
         };
 
-        personService.create(newPerson).then((returnedPerson) => {
-            setPersons([...persons, returnedPerson]);
+        personService
+            .create(newPerson)
+            .then((returnedPerson) => {
+                setPersons([...persons, returnedPerson]);
 
-            notifyUser(`Successfully added ${returnedPerson.name}!`);
-
-            setNewName("");
-            setNewNumber("");
-        });
+                notifyUser(`Successfully added ${returnedPerson.name}!`);
+            })
+            .catch((error) => notifyUser(error.response.data.error, true))
+            .finally(() => {
+                setNewName("");
+                setNewNumber("");
+            });
     };
 
     const removePerson = (id) => {
