@@ -81,12 +81,14 @@ const App = () => {
     const addPerson = () => {
         // If a person with the given name already exists, prompt to update the number
         let old = persons.find((person) => person.name === newName);
-        if (
-            old &&
-            window.confirm(
-                `${newName} is already added to phonebook, update the number?`
-            )
-        ) {
+
+        if (old) {
+            let confirm = window.confirm(
+                `${newName} is already in the phonebook. Update the number?`
+            );
+
+            if (!confirm) return;
+
             personService
                 .update(old.id, { ...old, number: newNumber })
                 .then((returnedPerson) => {
