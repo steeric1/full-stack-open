@@ -102,7 +102,13 @@ app.put("/api/persons/:id", (req, res, next) => {
     };
 
     Person.findByIdAndUpdate(id, updated, { new: true })
-        .then((updated) => res.json(updated))
+        .then((updated) => {
+            if (updated) {
+                res.json(updated);
+            } else {
+                res.status(404).end();
+            }
+        })
         .catch((error) => next(error));
 });
 
