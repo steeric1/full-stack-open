@@ -1,5 +1,6 @@
 const { test, describe } = require("node:test");
 const assert = require("node:assert");
+const _ = require("lodash");
 
 const listHelper = require("../utils/list_helper");
 
@@ -72,20 +73,41 @@ describe("total likes", () => {
 });
 
 describe("favorite blog", () => {
-    const blogsEqual = (blog1, blog2) =>
-        blog1.title === blog2.title &&
-        blog1.author === blog2.author &&
-        blog1.likes === blog2.likes;
-
     test("of an empty list is null", () => {
         assert.strictEqual(listHelper.favoriteBlog([]), null);
     });
 
     test("of a list with one blog is that blog", () => {
-        assert(blogsEqual(listHelper.favoriteBlog([blogs[0]]), blogs[0]));
+        assert.deepStrictEqual(
+            listHelper.favoriteBlog([blogs[0]]),
+            _.pick(blogs[0], ["title", "author", "likes"])
+        );
     });
 
     test("of a bigger list is correct", () => {
-        assert(blogsEqual(listHelper.favoriteBlog(blogs), blogs[2]));
+        assert.deepStrictEqual(
+            listHelper.favoriteBlog(blogs),
+            _.pick(blogs[2], ["title", "author", "likes"])
+        );
+    });
+});
+
+describe("most blogs by author", () => {
+    test("of an empty list is null", () => {
+        assert.strictEqual(listHelper.mostBlogs([]), null);
+    });
+
+    test("of a list with one blog matches author", () => [
+        assert.deepStrictEqual(listHelper.mostBlogs([blogs[0]]), {
+            author: blogs[0].author,
+            blogs: 1,
+        }),
+    ]);
+
+    test("of a bigger list is correct", () => {
+        assert.deepStrictEqual(listHelper.mostBlogs(blogs), {
+            author: "Robert C. Martin",
+            blogs: 3,
+        });
     });
 });
