@@ -10,7 +10,8 @@
     "build:ui": "rm -rf dist && cd ../part2/phonebook && pnpm run build && cp -r dist ../../phonebook_backend",
     "deploy": "fly deploy && fly scale count 1",
     "deploy:full": "pnpm run build:ui && pnpm run deploy",
-    "logs:prod": "fly logs"
+    "logs:prod": "fly logs",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,8 @@
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.2",
+    "@stylistic/eslint-plugin-js": "^1.7.0",
+    "eslint": "^8.57.0",
     "nodemon": "^3.1.0"
   }
 }
