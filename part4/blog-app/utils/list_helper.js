@@ -21,15 +21,32 @@ const favoriteBlog = (blogs) => {
 };
 
 const mostBlogs = (blogs) => {
-    let byAuthorBlogs = _.orderBy(
-        _.toPairs(_.countBy(blogs, "author")).map(([author, numBlogs]) => {
-            return { author, blogs: numBlogs };
-        }),
-        "blogs",
-        "desc"
+    return (
+        _.chain(blogs)
+            .countBy("author")
+            .toPairs()
+            .map(([author, numBlogs]) => ({
+                author,
+                blogs: numBlogs,
+            }))
+            .orderBy("blogs", "desc")
+            .head()
+            .value() || null
     );
-
-    return byAuthorBlogs[0] || null;
 };
 
-module.exports = { totalLikes, favoriteBlog, mostBlogs };
+const mostLikes = (blogs) => {
+    return (
+        _.chain(blogs)
+            .groupBy("author")
+            .map((blogs) => {
+                let likes = _.reduce(blogs, (sum, { likes }) => sum + likes, 0);
+                return { author: blogs[0].author, likes };
+            })
+            .orderBy("likes", "desc")
+            .head()
+            .value() || null
+    );
+};
+
+module.exports = { totalLikes, favoriteBlog, mostBlogs, mostLikes };

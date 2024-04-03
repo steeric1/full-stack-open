@@ -111,3 +111,23 @@ describe("most blogs by author", () => {
         });
     });
 });
+
+describe("most likes by author", () => {
+    test("of an empty list is null", () => {
+        assert.strictEqual(listHelper.mostLikes([]), null);
+    });
+
+    test("of a list with one blog matches author and likes", () => {
+        assert.deepStrictEqual(
+            listHelper.mostLikes([blogs[0]]),
+            _.pick(blogs[0], ["author", "likes"])
+        );
+    });
+
+    test("of a bigger list is correct", () => {
+        assert.deepStrictEqual(listHelper.mostLikes(blogs), {
+            author: "Edsger W. Dijkstra",
+            likes: 17,
+        });
+    });
+});
