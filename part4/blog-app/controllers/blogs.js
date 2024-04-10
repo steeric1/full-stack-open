@@ -34,4 +34,31 @@ blogsRouter.delete("/:id", async (request, response) => {
     }
 });
 
+blogsRouter.put("/:id", async (request, response) => {
+    const { likes } = request.body;
+    if (!likes) {
+        return response.status(400).end();
+    }
+
+    try {
+        const result = await Blog.findByIdAndUpdate(
+            request.params.id,
+            { likes },
+            { new: true }
+        );
+
+        if (result) {
+            response.json(result);
+        } else {
+            response.status(404).end();
+        }
+    } catch (err) {
+        if (err instanceof mongoose.Error.CastError) {
+            response.status(400).end();
+        } else {
+            response.status(500).end();
+        }
+    }
+});
+
 module.exports = blogsRouter;

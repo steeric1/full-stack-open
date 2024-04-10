@@ -1,3 +1,5 @@
+const Blog = require("../models/blog");
+
 const initialBlogs = [
     {
         title: "React patterns",
@@ -37,4 +39,19 @@ const initialBlogs = [
     },
 ];
 
-module.exports = { initialBlogs };
+const nonExistentBlogId = async () => {
+    const newBlog = {
+        title: "Svelte is better than React",
+        author: "Yours truly",
+        url: "https://youwontfindthis.com/",
+    };
+
+    const blog = await new Blog(newBlog).save();
+    const id = blog.id;
+
+    await Blog.findByIdAndDelete(id);
+
+    return id;
+};
+
+module.exports = { initialBlogs, nonExistentBlogId };

@@ -5,7 +5,7 @@ const supertest = require("supertest");
 
 const app = require("../app");
 const Blog = require("../models/blog");
-const { initialBlogs } = require("./test_helper");
+const { initialBlogs, nonExistentBlogId } = require("./test_helper");
 const _ = require("lodash");
 
 const api = supertest(app);
@@ -14,6 +14,8 @@ const BLOGS_ENDPOINT = "/api/blogs";
 const getBlogs = () => api.get(BLOGS_ENDPOINT);
 const postBlog = (body) => api.post(BLOGS_ENDPOINT).send(body);
 const deleteBlog = (id) => api.delete(`${BLOGS_ENDPOINT}/${id}`);
+const updateBlogLikes = (id, likes) =>
+    api.put(`${BLOGS_ENDPOINT}/${id}`).send({ likes });
 
 describe("Blog API (initialized with mock data)", () => {
     beforeEach(async () => {
@@ -114,19 +116,7 @@ describe("Blog API (initialized with mock data)", () => {
         });
 
         it("doesn't delete with non-existent id", async () => {
-            // first, let's get a non-existent id
-            const newBlog = {
-                title: "Svelte is better than React",
-                author: "Yours truly",
-                url: "https://youwontfindthis.com/",
-            };
-
-            const blog = await new Blog(newBlog).save();
-            const id = blog.id;
-
-            // we cannot use HTTP DELETE here because we don't know if it works yet!
-            Blog.findByIdAndDelete(id);
-
+            const id = await nonExistentBlogId();
             await deleteBlog(id).expect(204);
 
             const respose = await getBlogs();
@@ -146,6 +136,47 @@ describe("Blog API (initialized with mock data)", () => {
             const response = await getBlogs();
             assert.strictEqual(response.body.length, initialBlogs.length);
             assert(!response.body.some((blog) => blog.id === id));
+        });
+    });
+
+    describe(`PUT ${BLOGS_ENDPOINT}/:id`, () => {
+        it("rejects invalid id and doesn't update anything", async () => {
+            await updateBlogLikes("invalid-id", 999).expect(400);
+
+            const response = await getBlogs();
+            _.chain(response.body)
+                .map((blog) => _.omit(blog, "id"))
+                .each((blog, idx) =>
+                    assert.deepStrictEqual(blog, initialBlogs[idx])
+                );
+        });
+
+        it("doesn't update with non-existent id and returns 404", async () => {
+            const id = await nonExistentBlogId();
+            await updateBlogLikes(id, 999).expect(404);
+
+            const response = await getBlogs();
+            _.chain(response.body)
+                .map((blog) => _.omit(blog, "id"))
+                .each((blog, idx) =>
+                    assert.deepStrictEqual(blog, initialBlogs[idx])
+                );
+        });
+
+        it("updates blog likes with correct id and responds with updated JSON", async () => {
+            const blogs = (await getBlogs()).body;
+            const { id } = blogs[0];
+
+            let response = await updateBlogLikes(id, 123)
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
+
+            assert.strictEqual(response.body.likes, 123);
+
+            response = await getBlogs();
+            let likes = response.body.find((blog) => blog.id === id).likes;
+
+            assert.strictEqual(likes, 123);
         });
     });
 
