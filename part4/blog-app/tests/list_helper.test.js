@@ -3,57 +3,7 @@ const assert = require("node:assert");
 const _ = require("lodash");
 
 const listHelper = require("../utils/list_helper");
-
-const blogs = [
-    {
-        _id: "5a422a851b54a676234d17f7",
-        title: "React patterns",
-        author: "Michael Chan",
-        url: "https://reactpatterns.com/",
-        likes: 7,
-        __v: 0,
-    },
-    {
-        _id: "5a422aa71b54a676234d17f8",
-        title: "Go To Statement Considered Harmful",
-        author: "Edsger W. Dijkstra",
-        url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-        likes: 5,
-        __v: 0,
-    },
-    {
-        _id: "5a422b3a1b54a676234d17f9",
-        title: "Canonical string reduction",
-        author: "Edsger W. Dijkstra",
-        url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-        likes: 12,
-        __v: 0,
-    },
-    {
-        _id: "5a422b891b54a676234d17fa",
-        title: "First class tests",
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-        likes: 10,
-        __v: 0,
-    },
-    {
-        _id: "5a422ba71b54a676234d17fb",
-        title: "TDD harms architecture",
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-        likes: 0,
-        __v: 0,
-    },
-    {
-        _id: "5a422bc61b54a676234d17fc",
-        title: "Type wars",
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
-        likes: 2,
-        __v: 0,
-    },
-];
+const { initialBlogs } = require("./test_helper");
 
 describe("total likes", () => {
     test("of an empty list equals zero", () => {
@@ -61,14 +11,17 @@ describe("total likes", () => {
     });
 
     test("of a list with one blog equals likes of the singular blog", () => {
-        assert.strictEqual(listHelper.totalLikes([blogs[0]]), blogs[0].likes);
+        assert.strictEqual(
+            listHelper.totalLikes([initialBlogs[0]]),
+            initialBlogs[0].likes
+        );
     });
 
     test("of a bigger list is calculated correctly", () => {
         let likes = 0;
-        blogs.forEach((blog) => (likes += blog.likes));
+        initialBlogs.forEach((blog) => (likes += blog.likes));
 
-        assert.strictEqual(listHelper.totalLikes(blogs), likes);
+        assert.strictEqual(listHelper.totalLikes(initialBlogs), likes);
     });
 });
 
@@ -79,15 +32,15 @@ describe("favorite blog", () => {
 
     test("of a list with one blog is that blog", () => {
         assert.deepStrictEqual(
-            listHelper.favoriteBlog([blogs[0]]),
-            _.pick(blogs[0], ["title", "author", "likes"])
+            listHelper.favoriteBlog([initialBlogs[0]]),
+            _.pick(initialBlogs[0], ["title", "author", "likes"])
         );
     });
 
     test("of a bigger list is correct", () => {
         assert.deepStrictEqual(
-            listHelper.favoriteBlog(blogs),
-            _.pick(blogs[2], ["title", "author", "likes"])
+            listHelper.favoriteBlog(initialBlogs),
+            _.pick(initialBlogs[2], ["title", "author", "likes"])
         );
     });
 });
@@ -98,14 +51,14 @@ describe("most blogs by author", () => {
     });
 
     test("of a list with one blog matches author", () => [
-        assert.deepStrictEqual(listHelper.mostBlogs([blogs[0]]), {
-            author: blogs[0].author,
+        assert.deepStrictEqual(listHelper.mostBlogs([initialBlogs[0]]), {
+            author: initialBlogs[0].author,
             blogs: 1,
         }),
     ]);
 
     test("of a bigger list is correct", () => {
-        assert.deepStrictEqual(listHelper.mostBlogs(blogs), {
+        assert.deepStrictEqual(listHelper.mostBlogs(initialBlogs), {
             author: "Robert C. Martin",
             blogs: 3,
         });
@@ -119,13 +72,13 @@ describe("most likes by author", () => {
 
     test("of a list with one blog matches author and likes", () => {
         assert.deepStrictEqual(
-            listHelper.mostLikes([blogs[0]]),
-            _.pick(blogs[0], ["author", "likes"])
+            listHelper.mostLikes([initialBlogs[0]]),
+            _.pick(initialBlogs[0], ["author", "likes"])
         );
     });
 
     test("of a bigger list is correct", () => {
-        assert.deepStrictEqual(listHelper.mostLikes(blogs), {
+        assert.deepStrictEqual(listHelper.mostLikes(initialBlogs), {
             author: "Edsger W. Dijkstra",
             likes: 17,
         });
