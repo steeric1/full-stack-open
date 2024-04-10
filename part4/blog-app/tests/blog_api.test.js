@@ -11,6 +11,9 @@ const _ = require("lodash");
 const api = supertest(app);
 
 const BLOGS_ENDPOINT = "/api/blogs";
+const getBlogs = () => api.get(BLOGS_ENDPOINT);
+const postBlog = (body) => api.post(BLOGS_ENDPOINT).send(body);
+const deleteBlog = (id) => api.delete(`${BLOGS_ENDPOINT}/${id}`);
 
 describe("Blog API (initialized with mock data)", () => {
     beforeEach(async () => {
@@ -20,8 +23,7 @@ describe("Blog API (initialized with mock data)", () => {
 
     describe(`GET ${BLOGS_ENDPOINT}`, () => {
         it("returns correct number of blogs as JSON", async () => {
-            const response = await api
-                .get(BLOGS_ENDPOINT)
+            const response = await getBlogs()
                 .expect(200)
                 .expect("Content-Type", /application\/json/);
 
@@ -29,7 +31,7 @@ describe("Blog API (initialized with mock data)", () => {
         });
 
         it("returns blogs with id field", async () => {
-            const response = await api.get(BLOGS_ENDPOINT);
+            const response = await getBlogs();
 
             const numBlogs = response.body.length;
             const numWithId = response.body.filter((blog) =>
@@ -49,13 +51,11 @@ describe("Blog API (initialized with mock data)", () => {
                 likes: 999,
             };
 
-            await api
-                .post("/api/blogs")
-                .send(newBlog)
+            await postBlog(newBlog)
                 .expect(201)
                 .expect("Content-Type", /application\/json/);
 
-            const response = await api.get("/api/blogs");
+            const response = await getBlogs();
 
             assert.strictEqual(response.body.length, initialBlogs.length + 1);
             assert(
@@ -72,13 +72,12 @@ describe("Blog API (initialized with mock data)", () => {
                 url: "https://youwontfindthis.com/",
             };
 
-            const result = await api
-                .post("/api/blogs")
+            const response = await postBlog(newBlog)
                 .send(newBlog)
                 .expect(201)
                 .expect("Content-Type", /application\/json/);
 
-            assert.strictEqual(result.body.likes, 0);
+            assert.strictEqual(response.body.likes, 0);
         });
 
         it("rejects blog without title", async () => {
@@ -87,10 +86,10 @@ describe("Blog API (initialized with mock data)", () => {
                 url: "https://youwontfindthis.com/",
             };
 
-            await api.post("/api/blogs").send(newBlog).expect(400);
+            await postBlog(newBlog).expect(400);
 
-            const result = await api.get("/api/blogs");
-            assert.strictEqual(result.body.length, initialBlogs.length);
+            const response = await getBlogs();
+            assert.strictEqual(response.body.length, initialBlogs.length);
         });
 
         it("rejects blog without URL", async () => {
@@ -99,10 +98,54 @@ describe("Blog API (initialized with mock data)", () => {
                 author: "Yours truly",
             };
 
-            await api.post("/api/blogs").send(newBlog).expect(400);
+            await postBlog(newBlog).expect(400);
 
-            const result = await api.get("/api/blogs");
-            assert.strictEqual(result.body.length, initialBlogs.length);
+            const response = await api.get("/api/blogs");
+            assert.strictEqual(response.body.length, initialBlogs.length);
+        });
+    });
+
+    describe(`DELETE ${BLOGS_ENDPOINT}/:id`, () => {
+        it("rejects invalid id and doesn't delete", async () => {
+            await deleteBlog("invalid-id").expect(400);
+
+            const response = await getBlogs();
+            assert.strictEqual(response.body.length, initialBlogs.length);
+        });
+
+        it("doesn't delete with non-existent id", async () => {
+            // first, let's get a non-existent id
+            const newBlog = {
+                title: "Svelte is better than React",
+                author: "Yours truly",
+                url: "https://youwontfindthis.com/",
+            };
+
+            const blog = await new Blog(newBlog).save();
+            const id = blog.id;
+
+            // we cannot use HTTP DELETE here because we don't know if it works yet!
+            Blog.findByIdAndDelete(id);
+
+            await deleteBlog(id).expect(204);
+
+            const respose = await getBlogs();
+            assert.strictEqual(respose.body.length, initialBlogs.length);
+        });
+
+        it("deletes blog with correct id", async () => {
+            const newBlog = {
+                title: "Svelte is better than React",
+                author: "Yours truly",
+                url: "https://youwontfindthis.com/",
+            };
+
+            const id = (await postBlog(newBlog)).body.id;
+            await deleteBlog(id).expect(204);
+
+            const response = await getBlogs();
+            assert.strictEqual(response.body.length, initialBlogs.length);
+            assert(!response.body.some((blog) => blog.id === id));
         });
     });
 
