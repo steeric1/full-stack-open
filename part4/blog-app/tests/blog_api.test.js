@@ -10,94 +10,100 @@ const _ = require("lodash");
 
 const api = supertest(app);
 
-describe("blog api", () => {
+const BLOGS_ENDPOINT = "/api/blogs";
+
+describe("Blog API (initialized with mock data)", () => {
     beforeEach(async () => {
         await Blog.deleteMany({});
         await Blog.insertMany(initialBlogs);
     });
 
-    it("should return correct number of blogs", async () => {
-        const response = await api
-            .get("/api/blogs")
-            .expect(200)
-            .expect("Content-Type", /application\/json/);
+    describe(`GET ${BLOGS_ENDPOINT}`, () => {
+        it("returns correct number of blogs as JSON", async () => {
+            const response = await api
+                .get(BLOGS_ENDPOINT)
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
 
-        assert.strictEqual(response.body.length, initialBlogs.length);
+            assert.strictEqual(response.body.length, initialBlogs.length);
+        });
+
+        it("returns blogs with id field", async () => {
+            const response = await api.get(BLOGS_ENDPOINT);
+
+            const numBlogs = response.body.length;
+            const numWithId = response.body.filter((blog) =>
+                _.has(blog, "id")
+            ).length;
+
+            assert.strictEqual(numBlogs, numWithId);
+        });
     });
 
-    it("should return blogs with field 'id'", async () => {
-        const response = await api.get("/api/blogs");
+    describe(`POST ${BLOGS_ENDPOINT}`, () => {
+        it("adds new blog and the blog is found", async () => {
+            const newBlog = {
+                title: "Svelte is better than React",
+                author: "Yours truly",
+                url: "https://youwontfindthis.com/",
+                likes: 999,
+            };
 
-        const numBlogs = response.body.length;
-        const numWithId = response.body.filter((blog) =>
-            _.has(blog, "id")
-        ).length;
+            await api
+                .post("/api/blogs")
+                .send(newBlog)
+                .expect(201)
+                .expect("Content-Type", /application\/json/);
 
-        assert.strictEqual(numBlogs, numWithId);
-    });
+            const response = await api.get("/api/blogs");
 
-    it("can add a new blog and the new blog is found", async () => {
-        const newBlog = {
-            title: "Svelte is better than React",
-            author: "Yours truly",
-            url: "https://youwontfindthis.com/",
-            likes: 999,
-        };
+            assert.strictEqual(response.body.length, initialBlogs.length + 1);
+            assert(
+                _.chain(response.body)
+                    .map((blog) => _.omit(blog, "id"))
+                    .some((blog) => _.isEqual(blog, newBlog))
+            );
+        });
 
-        await api
-            .post("/api/blogs")
-            .send(newBlog)
-            .expect(201)
-            .expect("Content-Type", /application\/json/);
+        it("sets likes to 0 if omitted", async () => {
+            const newBlog = {
+                title: "Svelte is better than React",
+                author: "Yours truly",
+                url: "https://youwontfindthis.com/",
+            };
 
-        const response = await api.get("/api/blogs");
+            const result = await api
+                .post("/api/blogs")
+                .send(newBlog)
+                .expect(201)
+                .expect("Content-Type", /application\/json/);
 
-        assert.strictEqual(response.body.length, initialBlogs.length + 1);
-        assert(
-            _.chain(response.body)
-                .map((blog) => _.omit(blog, "id"))
-                .some((blog) => _.isEqual(blog, newBlog))
-        );
-    });
+            assert.strictEqual(result.body.likes, 0);
+        });
 
-    it("sets likes to 0 if omitted when submitting blog", async () => {
-        const newBlog = {
-            title: "Svelte is better than React",
-            author: "Yours truly",
-            url: "https://youwontfindthis.com/",
-        };
+        it("rejects blog without title", async () => {
+            const newBlog = {
+                author: "Yours truly",
+                url: "https://youwontfindthis.com/",
+            };
 
-        const result = await api
-            .post("/api/blogs")
-            .send(newBlog)
-            .expect(201)
-            .expect("Content-Type", /application\/json/);
+            await api.post("/api/blogs").send(newBlog).expect(400);
 
-        assert.strictEqual(result.body.likes, 0);
-    });
+            const result = await api.get("/api/blogs");
+            assert.strictEqual(result.body.length, initialBlogs.length);
+        });
 
-    it("rejects new blog if title is not set", async () => {
-        const newBlog = {
-            author: "Yours truly",
-            url: "https://youwontfindthis.com/",
-        };
+        it("rejects blog without URL", async () => {
+            const newBlog = {
+                title: "Svelte is better than React",
+                author: "Yours truly",
+            };
 
-        await api.post("/api/blogs").send(newBlog).expect(400);
+            await api.post("/api/blogs").send(newBlog).expect(400);
 
-        const result = await api.get("/api/blogs");
-        assert.strictEqual(result.body.length, initialBlogs.length);
-    });
-
-    it("rejects new blog if url is not set", async () => {
-        const newBlog = {
-            title: "Svelte is better than React",
-            author: "Yours truly",
-        };
-
-        await api.post("/api/blogs").send(newBlog).expect(400);
-
-        const result = await api.get("/api/blogs");
-        assert.strictEqual(result.body.length, initialBlogs.length);
+            const result = await api.get("/api/blogs");
+            assert.strictEqual(result.body.length, initialBlogs.length);
+        });
     });
 
     after(async () => {
