@@ -60,6 +60,22 @@ describe("blog api", () => {
         );
     });
 
+    it("sets likes to 0 if omitted when submitting blog", async () => {
+        const newBlog = {
+            title: "Svelte is better than React",
+            author: "Yours truly",
+            url: "https://youwontfindthis.com/",
+        };
+
+        const result = await api
+            .post("/api/blogs")
+            .send(newBlog)
+            .expect(201)
+            .expect("Content-Type", /application\/json/);
+
+        assert.strictEqual(result.body.likes, 0);
+    });
+
     after(async () => {
         await mongoose.connection.close();
     });
