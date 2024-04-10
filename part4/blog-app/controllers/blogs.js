@@ -1,4 +1,5 @@
 const blogsRouter = require("express").Router();
+const mongoose = require("mongoose");
 const Blog = require("../models/blog");
 
 blogsRouter.get("/", async (request, response) => {
@@ -7,9 +8,17 @@ blogsRouter.get("/", async (request, response) => {
 
 blogsRouter.post("/", async (request, response) => {
     const blog = new Blog(request.body);
-    const result = await blog.save();
 
-    response.status(201).json(result);
+    try {
+        const result = await blog.save();
+        response.status(201).json(result);
+    } catch (err) {
+        if (err instanceof mongoose.Error.ValidationError) {
+            response.status(400).end();
+        } else {
+            response.status(500).end();
+        }
+    }
 });
 
 module.exports = blogsRouter;

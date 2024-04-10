@@ -76,6 +76,30 @@ describe("blog api", () => {
         assert.strictEqual(result.body.likes, 0);
     });
 
+    it("rejects new blog if title is not set", async () => {
+        const newBlog = {
+            author: "Yours truly",
+            url: "https://youwontfindthis.com/",
+        };
+
+        await api.post("/api/blogs").send(newBlog).expect(400);
+
+        const result = await api.get("/api/blogs");
+        assert.strictEqual(result.body.length, initialBlogs.length);
+    });
+
+    it("rejects new blog if url is not set", async () => {
+        const newBlog = {
+            title: "Svelte is better than React",
+            author: "Yours truly",
+        };
+
+        await api.post("/api/blogs").send(newBlog).expect(400);
+
+        const result = await api.get("/api/blogs");
+        assert.strictEqual(result.body.length, initialBlogs.length);
+    });
+
     after(async () => {
         await mongoose.connection.close();
     });
