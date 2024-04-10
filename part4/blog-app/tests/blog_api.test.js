@@ -36,6 +36,30 @@ describe("blog api", () => {
         assert.strictEqual(numBlogs, numWithId);
     });
 
+    it("can add a new blog and the new blog is found", async () => {
+        const newBlog = {
+            title: "Svelte is better than React",
+            author: "Yours truly",
+            url: "https://youwontfindthis.com/",
+            likes: 999,
+        };
+
+        await api
+            .post("/api/blogs")
+            .send(newBlog)
+            .expect(201)
+            .expect("Content-Type", /application\/json/);
+
+        const response = await api.get("/api/blogs");
+
+        assert.strictEqual(response.body.length, initialBlogs.length + 1);
+        assert(
+            _.chain(response.body)
+                .map((blog) => _.omit(blog, "id"))
+                .some((blog) => _.isEqual(blog, newBlog))
+        );
+    });
+
     after(async () => {
         await mongoose.connection.close();
     });
