@@ -115,9 +115,9 @@ describe("Blog API (initialized with mock data)", () => {
             assert.strictEqual(response.body.length, initialBlogs.length);
         });
 
-        it("doesn't delete with non-existent id", async () => {
+        it("doesn't delete with non-existent id and returns 404", async () => {
             const id = await nonExistentBlogId();
-            await deleteBlog(id).expect(204);
+            await deleteBlog(id).expect(404);
 
             const respose = await getBlogs();
             assert.strictEqual(respose.body.length, initialBlogs.length);

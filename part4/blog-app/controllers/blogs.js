@@ -23,8 +23,8 @@ blogsRouter.post("/", async (request, response) => {
 
 blogsRouter.delete("/:id", async (request, response) => {
     try {
-        await Blog.findByIdAndDelete(request.params.id);
-        response.status(204).end();
+        const result = await Blog.findByIdAndDelete(request.params.id);
+        response.status(result ? 204 : 404).end();
     } catch (err) {
         if (err instanceof mongoose.Error.CastError) {
             response.status(400).end();
