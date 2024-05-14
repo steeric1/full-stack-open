@@ -6,6 +6,7 @@ const errorHandler = (err, request, response, next) => {
     const messages = {
         CastError: "malformed id",
         ValidationError: err.message,
+        JsonWebTokenError: "missing or invalid token",
     };
 
     if (messages[err.name])
