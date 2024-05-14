@@ -4,7 +4,7 @@ require("express-async-errors");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
-const { blogsRouter, usersRouter } = require("./controllers");
+const { blogsRouter, usersRouter, loginRouter } = require("./controllers");
 const { config, logger, middleware } = require("./utils");
 
 // Connect to MongoDB
@@ -25,6 +25,7 @@ app.use(express.json());
 
 app.use("/api/blogs", blogsRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/login", loginRouter);
 
 app.use(middleware.errorHandler);
 
