@@ -10,14 +10,10 @@ blogsRouter.get("/", async (request, response) => {
 });
 
 blogsRouter.post("/", async (request, response) => {
-    const { body } = request;
-
-    const { id } = jwt.verify(request.token, process.env.SECRET);
-    if (!id) {
-        return response.status(401).json({ error: "invalid token" });
+    const { body, user } = request;
+    if (!user) {
+        return response.status(401).json({ error: "not authenticated" });
     }
-
-    const user = await User.findById(id);
 
     const blog = new Blog({
         user: user._id,
@@ -33,22 +29,22 @@ blogsRouter.post("/", async (request, response) => {
 });
 
 blogsRouter.delete("/:id", async (request, response) => {
-    const { id: userId } = jwt.verify(request.token, process.env.SECRET);
-    if (!userId) {
-        return response.status(401).json({ error: "invalid token" });
+    const { user } = request;
+    if (!user) {
+        return response.status(401).json({ error: "not authenticated" });
     }
 
     const blogId = request.params.id;
     const blog = await Blog.findById(blogId);
     if (!blog) {
-        response.status(404).end();
+        return response.status(404).end();
     }
 
-    if (blog.user && blog.user.toString() === userId.toString()) {
+    if (blog.user && blog.user.toString() === user._id.toString()) {
         await Blog.findByIdAndDelete(blogId);
         response.status(204).end();
     } else {
-        response.status(403).json({ error: "invalid token" });
+        response.status(403).json({ error: "not authorized" });
     }
 });
 

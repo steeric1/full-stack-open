@@ -1,4 +1,7 @@
+const jwt = require("jsonwebtoken");
+
 const logger = require("./logger");
+const User = require("../models/user");
 
 const errorHandler = (err, request, response, next) => {
     if (process.env.NODE_ENV !== "test") logger.error(err);
@@ -25,7 +28,20 @@ const tokenExtractor = (request, response, next) => {
     next();
 };
 
+const userExtractor = async (request, response, next) => {
+    request.user = null;
+    if (request.token) {
+        const { id } = jwt.verify(request.token, process.env.SECRET);
+        const user = await User.findById(id);
+
+        if (user) request.user = user;
+    }
+
+    next();
+};
+
 module.exports = {
     errorHandler,
     tokenExtractor,
+    userExtractor,
 };
