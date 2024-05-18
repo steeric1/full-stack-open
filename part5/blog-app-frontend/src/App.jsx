@@ -151,12 +151,38 @@ const App = () => {
                         key={blog.id}
                         blog={blog}
                         handleLike={async () => {
-                            const liked = await blogService.like(blog);
-                            setBlogs(
-                                blogs.map((blog) =>
-                                    blog.id === liked.id ? liked : blog
-                                )
-                            );
+                            try {
+                                const liked = await blogService.like(blog);
+                                setBlogs(
+                                    blogs.map((blog) =>
+                                        blog.id === liked.id ? liked : blog
+                                    )
+                                );
+                            } catch (error) {
+                                setNotification({
+                                    kind: "error",
+                                    message: "failed to like blog",
+                                });
+                            }
+                        }}
+                        showRemove={
+                            blog.user && blog.user.username === user.username
+                        }
+                        handleRemove={async () => {
+                            if (!confirm("Are you sure?")) {
+                                return;
+                            }
+
+                            try {
+                                await blogService.remove(blog);
+                                setBlogs(blogs.filter((b) => b.id !== blog.id));
+                                setNotification({ message: "removed blog" });
+                            } catch (error) {
+                                setNotification({
+                                    kind: "error",
+                                    message: "failed to remove blog",
+                                });
+                            }
                         }}
                     />
                 ))}
