@@ -7,6 +7,8 @@ import {
 } from "react";
 
 import Blog from "./components/Blog";
+import BlogForm from "./components/BlogForm";
+
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
@@ -57,68 +59,6 @@ const User = ({ user, handleLogout }) => (
         {user.name} logged in <button onClick={handleLogout}>log out</button>
     </p>
 );
-
-const BlogForm = ({ handleNew, handleError }) => {
-    const [title, setTitle] = useState("");
-    const [author, setAuthor] = useState("");
-    const [url, setUrl] = useState("");
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-
-        try {
-            const blog = await blogService.create({ title, author, url });
-
-            setTitle("");
-            setAuthor("");
-            setUrl("");
-
-            handleNew(blog);
-        } catch (error) {
-            handleError();
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <h3>create new</h3>
-            <label htmlFor="title">
-                title{" "}
-                <input
-                    id="title"
-                    name="title"
-                    value={title}
-                    onChange={({ target }) => setTitle(target.value)}
-                    required
-                />
-            </label>
-            <br />
-            <label htmlFor="author">
-                author{" "}
-                <input
-                    id="author"
-                    name="author"
-                    value={author}
-                    onChange={({ target }) => setAuthor(target.value)}
-                    required
-                />
-            </label>
-            <br />
-            <label htmlFor="url">
-                url{" "}
-                <input
-                    id="url"
-                    name="url"
-                    value={url}
-                    onChange={({ target }) => setUrl(target.value)}
-                    required
-                />
-            </label>
-            <br />
-            <button type="submit">create</button>
-        </form>
-    );
-};
 
 const Togglable = forwardRef(({ showButtonLabel, children }, ref) => {
     const [visible, setVisible] = useState(false);
@@ -206,20 +146,22 @@ const App = () => {
 
             <Togglable showButtonLabel="create new blog" ref={blogFormRef}>
                 <BlogForm
-                    handleNew={(blog) => {
-                        setBlogs([...blogs, blog]);
+                    createBlog={async (blog) => {
+                        try {
+                            const newBlog = await blogService.create(blog);
+                            setBlogs([...blogs, newBlog]);
 
-                        setNotification({
-                            message: `new blog: ${blog.title} (by ${blog.author})`,
-                        });
+                            setNotification({
+                                message: `new blog: ${blog.title} (by ${blog.author})`,
+                            });
 
-                        blogFormRef.current.toggleVisibility();
-                    }}
-                    handleError={() => {
-                        setNotification({
-                            kind: "error",
-                            message: "failed to create blog",
-                        });
+                            blogFormRef.current.toggleVisibility();
+                        } catch (error) {
+                            setNotification({
+                                kind: "error",
+                                message: "failed to create blog",
+                            });
+                        }
                     }}
                 />
             </Togglable>
