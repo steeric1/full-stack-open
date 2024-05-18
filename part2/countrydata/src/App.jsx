@@ -48,9 +48,17 @@ const CountrySearch = () => {
       </div>
     );
   } else if (matchingCountries.length <= 10) {
-    countryData = matchingCountries.map((country) => (
-      <div key={country["cca2"]}>{country["name"]["common"]}</div>
-    ));
+    countryData = matchingCountries.map((country) => {
+      let countryName = country["name"]["common"];
+      return (
+        <div key={country["cca2"]}>
+          {countryName}{" "}
+          <button onClick={() => setValue(countryName)}>
+            show
+          </button>
+        </div>
+      );
+    });
   } else {
     countryData = <div>Too many matches, specify another filter</div>;
   }
