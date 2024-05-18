@@ -1,4 +1,6 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
+
 import Togglable from "./Togglable";
 
 const Blog = ({ blog, handleLike, showRemove, handleRemove }) => {
@@ -44,6 +46,13 @@ const Blog = ({ blog, handleLike, showRemove, handleRemove }) => {
             </section>
         </div>
     );
+};
+
+Blog.propTypes = {
+    blog: PropTypes.object.isRequired,
+    handleLike: PropTypes.func.isRequired,
+    showRemove: PropTypes.bool.isRequired,
+    handleRemove: PropTypes.func.isRequired,
 };
 
 export default Blog;

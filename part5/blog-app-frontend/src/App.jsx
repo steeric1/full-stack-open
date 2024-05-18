@@ -8,52 +8,13 @@ import {
 
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
+import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Togglable";
 
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 import "./styles.css";
-
-const LoginForm = ({ handleSubmit }) => {
-    const [name, setName] = useState("");
-    const [pass, setPass] = useState("");
-
-    return (
-        <div>
-            <h2>log in to the application</h2>
-            <form
-                onSubmit={(event) => {
-                    event.preventDefault();
-                    handleSubmit(name, pass);
-                }}
-            >
-                <label htmlFor="username">
-                    username{" "}
-                    <input
-                        id="username"
-                        name="username"
-                        onChange={({ target }) => setName(target.value)}
-                        required
-                    />
-                </label>
-                <br />
-                <label htmlFor="password">
-                    password{" "}
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        onChange={({ target }) => setPass(target.value)}
-                        required
-                    />
-                </label>
-                <br />
-                <button type="submit">login</button>
-            </form>
-        </div>
-    );
-};
 
 const User = ({ user, handleLogout }) => (
     <p>
@@ -166,7 +127,9 @@ const App = () => {
                             }
                         }}
                         showRemove={
-                            blog.user && blog.user.username === user.username
+                            blog.user
+                                ? blog.user.username === user.username
+                                : false
                         }
                         handleRemove={async () => {
                             if (!confirm("Are you sure?")) {
