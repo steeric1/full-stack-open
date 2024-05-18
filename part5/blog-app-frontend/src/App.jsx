@@ -8,6 +8,7 @@ import {
 
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
+import Togglable from "./components/Togglable";
 
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -59,31 +60,6 @@ const User = ({ user, handleLogout }) => (
         {user.name} logged in <button onClick={handleLogout}>log out</button>
     </p>
 );
-
-const Togglable = forwardRef(({ showButtonLabel, children }, ref) => {
-    const [visible, setVisible] = useState(false);
-
-    const hideWhenVisible = { display: visible ? "none" : "" };
-    const showWhenVisible = { display: visible ? "" : "none" };
-
-    useImperativeHandle(ref, () => ({
-        toggleVisibility() {
-            setVisible(!visible);
-        },
-    }));
-
-    return (
-        <div>
-            <button style={hideWhenVisible} onClick={() => setVisible(true)}>
-                {showButtonLabel}
-            </button>
-            <div style={showWhenVisible}>
-                {children}
-                <button onClick={() => setVisible(false)}>cancel</button>
-            </div>
-        </div>
-    );
-});
 
 const Notification = ({ kind, message }) => (
     <div className={`notification ${kind ?? ""}`}>{message}</div>
