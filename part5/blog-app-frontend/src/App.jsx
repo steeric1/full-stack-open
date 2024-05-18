@@ -1,4 +1,10 @@
-import { useState, useEffect } from "react";
+import {
+    useState,
+    useEffect,
+    useImperativeHandle,
+    forwardRef,
+    useRef,
+} from "react";
 
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
@@ -114,6 +120,31 @@ const BlogForm = ({ handleNew, handleError }) => {
     );
 };
 
+const Togglable = forwardRef(({ showButtonLabel, children }, ref) => {
+    const [visible, setVisible] = useState(false);
+
+    const hideWhenVisible = { display: visible ? "none" : "" };
+    const showWhenVisible = { display: visible ? "" : "none" };
+
+    useImperativeHandle(ref, () => ({
+        toggleVisibility() {
+            setVisible(!visible);
+        },
+    }));
+
+    return (
+        <div>
+            <button style={hideWhenVisible} onClick={() => setVisible(true)}>
+                {showButtonLabel}
+            </button>
+            <div style={showWhenVisible}>
+                {children}
+                <button onClick={() => setVisible(false)}>cancel</button>
+            </div>
+        </div>
+    );
+});
+
 const Notification = ({ kind, message }) => (
     <div className={`notification ${kind ?? ""}`}>{message}</div>
 );
@@ -159,6 +190,8 @@ const App = () => {
         }
     };
 
+    const blogFormRef = useRef();
+
     const main = user ? (
         <div>
             <h2>blogs</h2>
@@ -171,21 +204,25 @@ const App = () => {
                 }}
             />
 
-            <BlogForm
-                handleNew={(blog) => {
-                    setBlogs([...blogs, blog]);
+            <Togglable showButtonLabel="create new blog" ref={blogFormRef}>
+                <BlogForm
+                    handleNew={(blog) => {
+                        setBlogs([...blogs, blog]);
 
-                    setNotification({
-                        message: `new blog: ${blog.title} (by ${blog.author})`,
-                    });
-                }}
-                handleError={() => {
-                    setNotification({
-                        kind: "error",
-                        message: "failed to create blog",
-                    });
-                }}
-            />
+                        setNotification({
+                            message: `new blog: ${blog.title} (by ${blog.author})`,
+                        });
+
+                        blogFormRef.current.toggleVisibility();
+                    }}
+                    handleError={() => {
+                        setNotification({
+                            kind: "error",
+                            message: "failed to create blog",
+                        });
+                    }}
+                />
+            </Togglable>
 
             <br />
 
