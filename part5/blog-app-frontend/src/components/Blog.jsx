@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Togglable from "./Togglable";
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleLike }) => {
     const [infoVisible, setInfoVisible] = useState(false);
 
     const wrapperStyle = {
@@ -36,7 +36,8 @@ const Blog = ({ blog }) => {
             <section style={infoStyle}>
                 <div>{blog.url}</div>
                 <div>
-                    likes {blog.likes} <button>like</button>
+                    likes {blog.likes}{" "}
+                    <button onClick={handleLike}>like</button>
                 </div>
                 <div>{blog.author}</div>
             </section>
