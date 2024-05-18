@@ -11,14 +11,19 @@ const App = () => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        blogService.getAll().then((blogs) => setBlogs(blogs));
+        blogService.setToken(user ? user.token : null);
+    }, [user]);
+
+    useEffect(() => {
+        (async () => {
+            const blogs = await blogService.getAll();
+            setBlogs(blogs);
+        })();
     }, []);
 
     useEffect(() => {
-        const user = localStorage.getItem("loggedInUser");
-        if (user) {
-            setUser(JSON.parse(user));
-        }
+        let user = localStorage.getItem("loggedInUser");
+        user && setUser(JSON.parse(user));
     }, []);
 
     const handleLogin = async (event) => {
@@ -71,6 +76,8 @@ const App = () => {
         <div>
             <h2>blogs</h2>
             {userInfo()}
+            {blogForm()}
+            <br />
             {blogs.map((blog) => (
                 <Blog key={blog.id} blog={blog} />
             ))}
@@ -82,6 +89,64 @@ const App = () => {
             {user.name} logged in{" "}
             <button onClick={handleLogout}>log out</button>
         </p>
+    );
+
+    const [title, setTitle] = useState("");
+    const [author, setAuthor] = useState("");
+    const [url, setUrl] = useState("");
+
+    const handleCreate = async (event) => {
+        event.preventDefault();
+
+        try {
+            const blog = await blogService.create({ title, author, url });
+            setBlogs([...blogs, blog]);
+            setTitle("");
+            setAuthor("");
+            setUrl("");
+        } catch (error) {
+            console.log("failed to create blog", error);
+        }
+    };
+
+    const blogForm = () => (
+        <form onSubmit={handleCreate}>
+            <h3>create new</h3>
+            <label htmlFor="title">
+                title{" "}
+                <input
+                    id="title"
+                    name="title"
+                    value={title}
+                    onChange={({ target }) => setTitle(target.value)}
+                    required
+                />
+            </label>
+            <br />
+            <label htmlFor="author">
+                author{" "}
+                <input
+                    id="author"
+                    name="author"
+                    value={author}
+                    onChange={({ target }) => setAuthor(target.value)}
+                    required
+                />
+            </label>
+            <br />
+            <label htmlFor="url">
+                url{" "}
+                <input
+                    id="url"
+                    name="url"
+                    value={url}
+                    onChange={({ target }) => setUrl(target.value)}
+                    required
+                />
+            </label>
+            <br />
+            <button type="submit">create</button>
+        </form>
     );
 
     return <div>{user ? blogList() : loginForm()}</div>;
