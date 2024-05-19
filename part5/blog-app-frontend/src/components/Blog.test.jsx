@@ -15,11 +15,15 @@ describe("<Blog />", () => {
         },
     };
 
+    let handleLike;
+
     beforeEach(() => {
+        handleLike = vi.fn();
+
         render(
             <Blog
                 blog={blog}
-                handleLike={() => {}}
+                handleLike={handleLike}
                 showRemove={false}
                 handleRemove={() => {}}
             />
@@ -46,5 +50,18 @@ describe("<Blog />", () => {
         screen.queryByText(`likes ${blog.likes}`);
         screen.getByText(blog.url);
         screen.getByText(blog.user.name);
+    });
+
+    test("like handler is called multiple times", async () => {
+        const user = userEvent.setup();
+
+        const showBtn = screen.getByText("show");
+        await user.click(showBtn);
+
+        const likeBtn = screen.getByText("like");
+        await user.click(likeBtn);
+        await user.click(likeBtn);
+
+        expect(handleLike.mock.calls).toHaveLength(2);
     });
 });
