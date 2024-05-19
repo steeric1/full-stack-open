@@ -7,6 +7,12 @@ const user = {
     password: "markunsalis",
 };
 
+const anotherUser = {
+    name: "Seppo Järvinen",
+    username: "seppo",
+    password: "seponsalis",
+};
+
 const blog = {
     title: "Foo Blog",
     author: "Foo Author",
@@ -16,8 +22,13 @@ const blog = {
 describe("Blog App", () => {
     beforeEach(async ({ page, request }) => {
         await request.post("http:localhost:3003/api/testing/reset");
+
         await request.post("http://localhost:3003/api/users", {
             data: user,
+        });
+
+        await request.post("http://localhost:3003/api/users", {
+            data: anotherUser,
         });
 
         await page.goto("http://localhost:5173");
@@ -58,11 +69,11 @@ describe("Blog App", () => {
 
     describe("when logged in", () => {
         beforeEach(async ({ page }) => {
-            loginWith(page, user.username, user.password);
+            await loginWith(page, user.username, user.password);
         });
 
         test("a new blog can be created", async ({ page }) => {
-            createBlog(page, blog);
+            await createBlog(page, blog);
 
             await expect(
                 page.getByText(`${blog.title} ${blog.author}`)
@@ -71,7 +82,7 @@ describe("Blog App", () => {
 
         describe("and a blog has been created", () => {
             beforeEach(async ({ page }) => {
-                createBlog(page, blog);
+                await createBlog(page, blog);
             });
 
             test("a blog can be liked", async ({ page }) => {
@@ -90,6 +101,20 @@ describe("Blog App", () => {
 
                 await expect(
                     page.getByText(`${blog.title} ${blog.author}`)
+                ).not.toBeVisible();
+            });
+
+            test("another user doesn't see remove button", async ({ page }) => {
+                await page.getByRole("button", { name: "log out" }).click();
+                await loginWith(
+                    page,
+                    anotherUser.username,
+                    anotherUser.password
+                );
+
+                await page.getByRole("button", { name: "show" }).click();
+                await expect(
+                    page.getByRole("button", { name: "remove" })
                 ).not.toBeVisible();
             });
         });
