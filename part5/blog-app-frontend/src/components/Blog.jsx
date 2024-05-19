@@ -22,28 +22,31 @@ const Blog = ({ blog, handleLike, showRemove, handleRemove }) => {
 
     const infoStyle = {
         margin: 4,
-        display: infoVisible ? "block" : "none",
     };
+
+    const info = () => (
+        <section style={infoStyle}>
+            <div>{blog.url}</div>
+            <div>
+                <span>likes {blog.likes}</span>{" "}
+                <button onClick={handleLike}>like</button>
+            </div>
+            <div>{blog.user ? blog.user.name : ""}</div>
+            {showRemove && <button onClick={handleRemove}>remove</button>}
+        </section>
+    );
 
     return (
         <div style={wrapperStyle}>
             <div style={titleStyle}>
                 <div>
-                    {blog.title} {blog.author}
+                    <span>{blog.title}</span> <span>{blog.author}</span>
                 </div>
                 <button onClick={() => setInfoVisible(!infoVisible)}>
                     {infoVisible ? "hide" : "show"}
                 </button>
             </div>
-            <section style={infoStyle}>
-                <div>{blog.url}</div>
-                <div>
-                    likes {blog.likes}{" "}
-                    <button onClick={handleLike}>like</button>
-                </div>
-                <div>{blog.author}</div>
-                {showRemove && <button onClick={handleRemove}>remove</button>}
-            </section>
+            {infoVisible && info()}
         </div>
     );
 };
