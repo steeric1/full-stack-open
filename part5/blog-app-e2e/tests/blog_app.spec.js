@@ -81,6 +81,17 @@ describe("Blog App", () => {
                 await page.getByRole("button", { name: "like" }).click();
                 await expect(page.getByText("likes 1")).toBeVisible();
             });
+
+            test("the blog can be removed", async ({ page }) => {
+                await page.getByRole("button", { name: "show" }).click();
+
+                page.on("dialog", (dialog) => dialog.accept());
+                await page.getByRole("button", { name: "remove" }).click();
+
+                await expect(
+                    page.getByText(`${blog.title} ${blog.author}`)
+                ).not.toBeVisible();
+            });
         });
     });
 });
