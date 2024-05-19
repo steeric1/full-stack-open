@@ -37,8 +37,12 @@ const Blog = ({ blog, handleLike, showRemove, handleRemove }) => {
     );
 
     return (
-        <div style={wrapperStyle}>
-            <div style={titleStyle}>
+        <div
+            style={wrapperStyle}
+            className="blog"
+            data-testid={`blog-${blog.id}`}
+        >
+            <div style={titleStyle} className="blog-title">
                 <div>
                     <span>{blog.title}</span> <span>{blog.author}</span>
                 </div>

@@ -13,11 +13,23 @@ const anotherUser = {
     password: "seponsalis",
 };
 
-const blog = {
-    title: "Foo Blog",
-    author: "Foo Author",
-    url: "foo.url",
-};
+const blogs = [
+    {
+        title: "Blog 1",
+        author: "Author 1",
+        url: "one.url",
+    },
+    {
+        title: "Blog 2",
+        author: "Author 2",
+        url: "two.url",
+    },
+    {
+        title: "Blog 3",
+        author: "Author 3",
+        url: "three.url",
+    },
+];
 
 describe("Blog App", () => {
     beforeEach(async ({ page, request }) => {
@@ -73,16 +85,16 @@ describe("Blog App", () => {
         });
 
         test("a new blog can be created", async ({ page }) => {
-            await createBlog(page, blog);
+            await createBlog(page, blogs[0]);
 
             await expect(
-                page.getByText(`${blog.title} ${blog.author}`)
+                page.getByText(`${blogs[0].title} ${blogs[0].author}`)
             ).toBeVisible();
         });
 
         describe("and a blog has been created", () => {
             beforeEach(async ({ page }) => {
-                await createBlog(page, blog);
+                await createBlog(page, blogs[0]);
             });
 
             test("a blog can be liked", async ({ page }) => {
@@ -100,7 +112,7 @@ describe("Blog App", () => {
                 await page.getByRole("button", { name: "remove" }).click();
 
                 await expect(
-                    page.getByText(`${blog.title} ${blog.author}`)
+                    page.getByText(`${blogs[0].title} ${blogs[0].author}`)
                 ).not.toBeVisible();
             });
 
@@ -116,6 +128,45 @@ describe("Blog App", () => {
                 await expect(
                     page.getByRole("button", { name: "remove" })
                 ).not.toBeVisible();
+            });
+
+            test("blogs are sorted with respect to likes", async ({ page }) => {
+                await createBlog(page, blogs[1]);
+                await createBlog(page, blogs[2]);
+
+                const allBlogs = await page.locator(".blog").all();
+
+                const ids = await Promise.all(
+                    allBlogs.map(
+                        async (blog) => await blog.getAttribute("data-testid")
+                    )
+                );
+                expect(ids).toHaveLength(3);
+
+                for (let i = 0; i < ids.length; ++i) {
+                    const current = page.getByTestId(ids[i]);
+                    await current.getByRole("button", { name: "show" }).click();
+
+                    for (let j = 0; j < i + 1; ++j) {
+                        await current
+                            .getByRole("button", { name: "like" })
+                            .click();
+
+                        await current.getByText(`likes ${j + 1}`).waitFor();
+                    }
+                }
+
+                const likes = await page.getByText(/likes/).all();
+                expect(likes).toHaveLength(3);
+
+                const toNum = async (likes) =>
+                    Number((await likes.textContent()).replace("likes ", ""));
+
+                for (let i = 1; i < likes.length; ++i) {
+                    expect(await toNum(likes[i])).toBeLessThan(
+                        await toNum(likes[i - 1])
+                    );
+                }
             });
         });
     });
