@@ -18,7 +18,6 @@ module.exports = {
     plugins: ["react-refresh"],
     rules: {
         indent: ["error", 4],
-        "linebreak-style": ["error", "unix"],
         quotes: ["error", "double"],
         semi: ["error", "always"],
         eqeqeq: "error",
