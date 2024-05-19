@@ -28,7 +28,7 @@ describe("Blog App", () => {
         await expect(page.getByRole("button", { name: "login" })).toBeVisible();
     });
 
-    describe("Login", () => {
+    describe("login", () => {
         test("succeeds with correct credentials", async ({ page }) => {
             await loginWith(page, user.username, user.password);
 
@@ -47,6 +47,24 @@ describe("Blog App", () => {
             await expect(
                 page.getByText("wrong username or password")
             ).toBeVisible();
+        });
+    });
+
+    describe("when logged in", () => {
+        beforeEach(async ({ page }) => {
+            loginWith(page, user.username, user.password);
+        });
+
+        test("a new blog can be created", async ({ page }) => {
+            await page.getByRole("button", { name: "create new blog" }).click();
+
+            await page.getByTestId("title").fill("Foo Blog");
+            await page.getByTestId("author").fill("Foo Author");
+            await page.getByTestId("url").fill("Foo Url");
+
+            await page.getByRole("button", { name: "create" }).click();
+
+            await expect(page.getByText("Foo Blog Foo Author")).toBeVisible();
         });
     });
 });
