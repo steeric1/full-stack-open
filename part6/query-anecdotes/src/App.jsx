@@ -3,6 +3,7 @@ import axios from "axios";
 
 import AnecdoteForm from "./components/AnecdoteForm";
 import Notification from "./components/Notification";
+import AnecdoteList from "./components/AnecdoteList";
 import { getAnecdotes } from "./requests";
 
 const App = () => {
@@ -35,17 +36,7 @@ const App = () => {
             <Notification />
             <AnecdoteForm />
 
-            {anecdotes.map((anecdote) => (
-                <div key={anecdote.id}>
-                    <div>{anecdote.content}</div>
-                    <div>
-                        has {anecdote.votes}
-                        <button onClick={() => handleVote(anecdote)}>
-                            vote
-                        </button>
-                    </div>
-                </div>
-            ))}
+            <AnecdoteList anecdotes={anecdotes} />
         </div>
     );
 };
