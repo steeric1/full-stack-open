@@ -14,4 +14,13 @@ const create = async (content) => {
     return response.data;
 };
 
-export default { getAll, create };
+const vote = async (id) => {
+    const { data: current } = await axios.get(`${baseUrl}/${id}`);
+    const { data } = await axios.patch(`${baseUrl}/${id}`, {
+        votes: current.votes + 1,
+    });
+
+    return data;
+};
+
+export default { getAll, create, vote };
