@@ -19,12 +19,7 @@ const anecdoteSlice = createSlice({
             );
         },
         createAnecdote(state, action) {
-            const anecdote = {
-                content: action.payload,
-                votes: 0,
-            };
-
-            return sortAnecdotes(state.concat(anecdote));
+            return sortAnecdotes(state.concat(action.payload));
         },
         setAnecdotes(state, action) {
             return action.payload;
