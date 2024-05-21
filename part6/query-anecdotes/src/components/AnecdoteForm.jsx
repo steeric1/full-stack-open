@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { createAnecdote } from "../requests";
+import { useNotificationDispatch } from "../NotificationContext";
 
 const AnecdoteForm = () => {
     const queryClient = useQueryClient();
+    const notifDispatch = useNotificationDispatch();
 
     const newAnecdoteMutation = useMutation({
         mutationFn: createAnecdote,
@@ -13,6 +15,11 @@ const AnecdoteForm = () => {
                 ["anecdotes"],
                 anecdotes.concat(newAnecdote)
             );
+
+            notifDispatch({
+                type: "SET",
+                payload: `you created anecdote: "${newAnecdote.content}"`,
+            });
         },
     });
 
