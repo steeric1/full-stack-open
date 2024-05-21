@@ -23,21 +23,25 @@ const reducer = (state = initialState, action) => {
     console.log("state now: ", state);
     console.log("action", action);
 
-    switch (action.type) {
-        case "VOTE": {
-            const id = action.payload.id;
-            return state.map((anecdote) =>
-                anecdote.id === id
-                    ? { ...anecdote, votes: anecdote.votes + 1 }
-                    : anecdote
-            );
+    const handle = () => {
+        switch (action.type) {
+            case "VOTE": {
+                const id = action.payload.id;
+                return state.map((anecdote) =>
+                    anecdote.id === id
+                        ? { ...anecdote, votes: anecdote.votes + 1 }
+                        : anecdote
+                );
+            }
+            case "NEW_ANECDOTE": {
+                return [...state, action.payload];
+            }
+            default:
+                return state;
         }
-        case "NEW_ANECDOTE": {
-            return [...state, action.payload];
-        }
-        default:
-            return state;
-    }
+    };
+
+    return handle().sort((a, b) => b.votes - a.votes);
 };
 
 export const vote = (id) => ({
