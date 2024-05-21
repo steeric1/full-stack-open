@@ -21,6 +21,12 @@ const AnecdoteForm = () => {
                 payload: `you created anecdote: "${newAnecdote.content}"`,
             });
         },
+        onError({ response }) {
+            notifDispatch({
+                type: "SET",
+                payload: response.data.error,
+            });
+        },
     });
 
     const onCreate = (event) => {
