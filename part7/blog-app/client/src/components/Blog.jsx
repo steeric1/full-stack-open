@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 
-import { likeBlog, removeBlog } from "../reducers/blogReducer";
+import { commentBlog, likeBlog, removeBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
 import { useCurrentUser } from "../hooks";
 
@@ -38,6 +38,20 @@ const Blog = () => {
 
     const showRemove = blog.user ? blog.user.username === user.username : false;
 
+    const handleComment = async (event) => {
+        event.preventDefault();
+
+        const content = event.target.comment.value;
+        event.target.comment.value = "";
+
+        try {
+            await dispatch(commentBlog(blog, content));
+            dispatch(setNotification("commented blog"));
+        } catch (error) {
+            dispatch(setNotification("failed to comment blog", "error"));
+        }
+    };
+
     const margin = {
         margin: 4,
     };
@@ -61,6 +75,10 @@ const Blog = () => {
                 </div>
                 <div>
                     <h3>comments</h3>
+                    <form onSubmit={handleComment}>
+                        <input name="comment" />
+                        <button>add comment</button>
+                    </form>
                     <ul>
                         {blog.comments.map((comment) => (
                             <li key={comment.id}>{comment.content}</li>

@@ -50,6 +50,13 @@ export const likeBlog = (blog) => {
     };
 };
 
+export const commentBlog = (blog, content) => {
+    return async (dispatch) => {
+        const commented = await blogService.comment(blog, content);
+        dispatch(update(commented));
+    };
+};
+
 export const removeBlog = (blog) => {
     return async (dispatch) => {
         await blogService.remove(blog);
