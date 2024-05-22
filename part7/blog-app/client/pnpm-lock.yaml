@@ -23,10 +23,10 @@ importers:
     devDependencies:
       '@testing-library/jest-dom':
         specifier: ^6.4.5
-        version: 6.4.5(vitest@1.6.0)
+        version: 6.4.5(vitest@1.6.0(jsdom@24.0.0))
       '@testing-library/react':
         specifier: ^15.0.7
-        version: 15.0.7(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1)
+        version: 15.0.7(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@testing-library/user-event':
         specifier: ^14.5.2
         version: 14.5.2(@testing-library/dom@10.1.0)
@@ -57,6 +57,9 @@ importers:
       jsdom:
         specifier: ^24.0.0
         version: 24.0.0
+      prettier:
+        specifier: 3.2.5
+        version: 3.2.5
       vite:
         specifier: ^4.4.5
         version: 4.5.3
@@ -1572,6 +1575,11 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
+  prettier@3.2.5:
+    resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   pretty-format@27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
@@ -2438,7 +2446,7 @@ snapshots:
       lz-string: 1.5.0
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@6.4.5(vitest@1.6.0)':
+  '@testing-library/jest-dom@6.4.5(vitest@1.6.0(jsdom@24.0.0))':
     dependencies:
       '@adobe/css-tools': 4.3.3
       '@babel/runtime': 7.24.5
@@ -2448,16 +2456,18 @@ snapshots:
       dom-accessibility-api: 0.6.3
       lodash: 4.17.21
       redent: 3.0.0
+    optionalDependencies:
       vitest: 1.6.0(jsdom@24.0.0)
 
-  '@testing-library/react@15.0.7(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1)':
+  '@testing-library/react@15.0.7(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.24.5
       '@testing-library/dom': 10.1.0
-      '@types/react': 18.3.2
       '@types/react-dom': 18.3.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
+    optionalDependencies:
+      '@types/react': 18.3.2
 
   '@testing-library/user-event@14.5.2(@testing-library/dom@10.1.0)':
     dependencies:
@@ -3605,6 +3615,8 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
+  prettier@3.2.5: {}
+
   pretty-format@27.5.1:
     dependencies:
       ansi-regex: 5.0.1
@@ -3980,7 +3992,6 @@ snapshots:
       chai: 4.4.1
       debug: 4.3.4
       execa: 8.0.1
-      jsdom: 24.0.0
       local-pkg: 0.5.0
       magic-string: 0.30.10
       pathe: 1.1.2
@@ -3992,6 +4003,8 @@ snapshots:
       vite: 5.2.11
       vite-node: 1.6.0
       why-is-node-running: 2.2.2
+    optionalDependencies:
+      jsdom: 24.0.0
     transitivePeerDependencies:
       - less
       - lightningcss

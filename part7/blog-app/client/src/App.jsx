@@ -116,8 +116,8 @@ const App = () => {
                                 const liked = await blogService.like(blog);
                                 setBlogs(
                                     blogs.map((blog) =>
-                                        blog.id === liked.id ? liked : blog
-                                    )
+                                        blog.id === liked.id ? liked : blog,
+                                    ),
                                 );
                             } catch (error) {
                                 setNotification({
