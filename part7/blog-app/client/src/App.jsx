@@ -1,18 +1,24 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Routes, Route, useMatch } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Blogs from "./components/Blogs";
+import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
 import Users from "./components/Users";
 import User from "./components/User";
 
 import { useCurrentUser, useUsers } from "./hooks";
+import { initializeBlogs } from "./reducers/blogReducer";
 
 const App = () => {
+    const dispatch = useDispatch();
     const [_, initializeUsers] = useUsers();
-    useEffect(() => initializeUsers(), []);
+    useEffect(() => {
+        dispatch(initializeBlogs());
+        initializeUsers();
+    }, []);
 
     const [currentUser, { logout }] = useCurrentUser();
     if (!currentUser) {
@@ -39,6 +45,7 @@ const App = () => {
                 <Route path="/" element={<Blogs />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/users/:id" element={<User />} />
+                <Route path="/blogs/:id" element={<Blog />} />
             </Routes>
         </>
     );
