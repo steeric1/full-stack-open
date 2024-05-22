@@ -5,7 +5,7 @@ import {
     forwardRef,
     useRef,
 } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
@@ -16,7 +16,14 @@ import Notification from "./components/Notification";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
+import {
+    createBlog,
+    likeBlog,
+    initializeBlogs,
+    removeBlog,
+} from "./reducers/blogReducer";
 import { setNotification } from "./reducers/notificationReducer";
+import { useUser } from "./hooks";
 
 const User = ({ user, handleLogout }) => (
     <p>
@@ -25,123 +32,46 @@ const User = ({ user, handleLogout }) => (
 );
 
 const App = () => {
-    const [blogs, setBlogs] = useState([]);
-    const [user, setUser] = useState(null);
+    const blogs = useSelector((state) => state.blogs);
+    const [user, userService] = useUser();
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(initializeBlogs());
+        userService.init();
+    }, []);
 
     const notify = (message, kind = "") =>
         dispatch(setNotification(message, kind));
 
-    useEffect(() => {
-        blogService.setToken(user ? user.token : null);
-    }, [user]);
+    const blogTogglerRef = useRef();
 
-    useEffect(() => {
-        (async () => {
-            const blogs = await blogService.getAll();
-            setBlogs(blogs);
-        })();
-    }, []);
+    if (!user) {
+        return <LoginForm />;
+    }
 
-    useEffect(() => {
-        let user = localStorage.getItem("loggedInUser");
-        user && setUser(JSON.parse(user));
-    }, []);
-
-    const handleLogin = async (name, pass) => {
-        try {
-            const user = await loginService.login(name, pass);
-
-            setUser(user);
-            localStorage.setItem("loggedInUser", JSON.stringify(user));
-        } catch (error) {
-            notify("wrong username or password", "error");
-        }
-    };
-
-    const blogFormRef = useRef();
-
-    const main = user ? (
+    return (
         <div>
+            <Notification />
+
             <h2>blogs</h2>
 
-            <User
-                user={user}
-                handleLogout={() => {
-                    setUser(null);
-                    localStorage.removeItem("loggedInUser");
-                }}
-            />
+            <User user={user} handleLogout={userService.logout} />
 
-            <Togglable showButtonLabel="create new blog" ref={blogFormRef}>
+            <Togglable showButtonLabel="create new blog" ref={blogTogglerRef}>
                 <BlogForm
-                    createBlog={async (blog) => {
-                        try {
-                            const newBlog = await blogService.create(blog);
-                            setBlogs([...blogs, newBlog]);
-
-                            notify(
-                                `new blog: ${blog.title} (by ${blog.author})`,
-                            );
-
-                            blogFormRef.current.toggleVisibility();
-                        } catch (error) {
-                            notify("failed to create blog", "error");
-                        }
-                    }}
+                    toggleVisibility={() =>
+                        blogTogglerRef.current.toggleVisibility()
+                    }
                 />
             </Togglable>
 
             <br />
 
-            {blogs
-                .sort((a, b) => b.likes - a.likes)
-                .map((blog) => (
-                    <Blog
-                        key={blog.id}
-                        blog={blog}
-                        handleLike={async () => {
-                            try {
-                                const liked = await blogService.like(blog);
-                                setBlogs(
-                                    blogs.map((blog) =>
-                                        blog.id === liked.id ? liked : blog,
-                                    ),
-                                );
-                            } catch (error) {
-                                notify("failed to like blog", "error");
-                            }
-                        }}
-                        showRemove={
-                            blog.user
-                                ? blog.user.username === user.username
-                                : false
-                        }
-                        handleRemove={async () => {
-                            if (!confirm("Are you sure?")) {
-                                return;
-                            }
-
-                            try {
-                                await blogService.remove(blog);
-                                setBlogs(blogs.filter((b) => b.id !== blog.id));
-                                notify("removed blog");
-                            } catch (error) {
-                                notify("failed to remove blog", "error");
-                            }
-                        }}
-                    />
-                ))}
+            {blogs.map((blog) => (
+                <Blog key={blog.id} blog={blog} />
+            ))}
         </div>
-    ) : (
-        <LoginForm handleSubmit={handleLogin} />
-    );
-
-    return (
-        <>
-            <Notification />
-            {main}
-        </>
     );
 };
 

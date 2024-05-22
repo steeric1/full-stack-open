@@ -1,9 +1,15 @@
+import { useDispatch } from "react-redux";
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-import Togglable from "./Togglable";
+import { likeBlog, removeBlog } from "../reducers/blogReducer";
+import { setNotification } from "../reducers/notificationReducer";
+import { useUser } from "../hooks";
 
-const Blog = ({ blog, handleLike, showRemove, handleRemove }) => {
+const Blog = ({ blog }) => {
+    const dispatch = useDispatch();
+    const [user] = useUser();
+
     const [infoVisible, setInfoVisible] = useState(false);
 
     const wrapperStyle = {
@@ -23,6 +29,29 @@ const Blog = ({ blog, handleLike, showRemove, handleRemove }) => {
     const infoStyle = {
         margin: 4,
     };
+
+    const handleLike = async () => {
+        try {
+            await dispatch(likeBlog(blog));
+        } catch (error) {
+            dispatch(setNotification("failed to like blog", "error"));
+        }
+    };
+
+    const handleRemove = async () => {
+        if (!confirm("Are you sure?")) {
+            return;
+        }
+
+        try {
+            await dispatch(removeBlog(blog));
+            dispatch(setNotification("removed blog"));
+        } catch (error) {
+            dispatch(setNotification("failed to remove blog", "error"));
+        }
+    };
+
+    const showRemove = blog.user ? blog.user.username === user.username : false;
 
     const info = () => (
         <section style={infoStyle}>
@@ -57,9 +86,6 @@ const Blog = ({ blog, handleLike, showRemove, handleRemove }) => {
 
 Blog.propTypes = {
     blog: PropTypes.object.isRequired,
-    handleLike: PropTypes.func.isRequired,
-    showRemove: PropTypes.bool.isRequired,
-    handleRemove: PropTypes.func.isRequired,
 };
 
 export default Blog;

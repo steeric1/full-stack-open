@@ -5,7 +5,6 @@ const slice = createSlice({
     initialState: { message: "", kind: "" },
     reducers: {
         set(state, action) {
-            console.log("setddting!");
             return action.payload;
         },
         clear() {
