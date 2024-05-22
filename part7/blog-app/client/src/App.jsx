@@ -25,7 +25,7 @@ const App = () => {
     }
 
     return (
-        <div>
+        <>
             <Notification />
 
             <h2>blogs</h2>
@@ -40,7 +40,7 @@ const App = () => {
                 <Route path="/users" element={<Users />} />
                 <Route path="/users/:id" element={<User />} />
             </Routes>
-        </div>
+        </>
     );
 };
 
