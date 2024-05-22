@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMatch } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
@@ -85,6 +86,8 @@ const CreateNew = (props) => {
     const [author, setAuthor] = useState("");
     const [info, setInfo] = useState("");
 
+    const navigate = useNavigate();
+
     const handleSubmit = (e) => {
         e.preventDefault();
         props.addNew({
@@ -93,6 +96,7 @@ const CreateNew = (props) => {
             info,
             votes: 0,
         });
+        navigate("/");
     };
 
     return (
@@ -148,10 +152,15 @@ const App = () => {
     ]);
 
     const [notification, setNotification] = useState("");
+    const [notifTimeout, setNotifTimeout] = useState(null);
 
     const addNew = (anecdote) => {
         anecdote.id = Math.round(Math.random() * 10000);
         setAnecdotes(anecdotes.concat(anecdote));
+
+        clearTimeout(notifTimeout);
+        setNotification(`a new anecdote ${anecdote.content} created!`);
+        setNotifTimeout(setTimeout(() => setNotification(""), 5000));
     };
 
     const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
@@ -174,6 +183,8 @@ const App = () => {
         <div>
             <h1>Software anecdotes</h1>
             <Menu />
+
+            <div>{notification}</div>
 
             <Routes>
                 <Route
