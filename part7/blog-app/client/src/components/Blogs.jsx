@@ -7,7 +7,7 @@ import BlogForm from "./BlogForm";
 
 import { initializeBlogs, likeBlog, removeBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
-import { useUser } from "../hooks";
+import { useUsers } from "../hooks";
 
 const Blogs = () => {
     const blogs = useSelector((state) => state.blogs);
@@ -39,7 +39,7 @@ const Blogs = () => {
 
 const Blog = ({ blog }) => {
     const dispatch = useDispatch();
-    const [user] = useUser();
+    const [user] = useUsers();
 
     const [infoVisible, setInfoVisible] = useState(false);
 

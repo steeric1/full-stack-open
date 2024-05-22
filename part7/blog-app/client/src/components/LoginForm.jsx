@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { useUser } from "../hooks";
+import { useCurrentUser } from "../hooks";
 import { setNotification } from "../reducers/notificationReducer";
 
 const LoginForm = () => {
     const dispatch = useDispatch();
-    const [_, service] = useUser();
+    const [_, { login }] = useCurrentUser();
 
     const [name, setName] = useState("");
     const [pass, setPass] = useState("");
@@ -15,7 +15,7 @@ const LoginForm = () => {
         event.preventDefault();
 
         try {
-            await service.login(name, pass);
+            await login(name, pass);
         } catch (error) {
             dispatch(setNotification("wrong username or password", "error"));
         }

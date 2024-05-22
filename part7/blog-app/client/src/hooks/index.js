@@ -1,29 +1,42 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { initializeUser, loginUser, logoutUser } from "../reducers/userReducer";
+import {
+    initializeUsers,
+    loginUser,
+    removeCurrent,
+} from "../reducers/userReducer";
 import blogService from "../services/blogs";
 import loginService from "../services/login";
 
-export const useUser = () => {
+export const useUsers = () => {
     const dispatch = useDispatch();
-    const user = useSelector((state) => state.user);
-
-    useEffect(() => {
-        blogService.setToken(user ? user.token : null);
-    }, [user]);
+    const { all } = useSelector((state) => state.users);
 
     return [
-        user,
+        all,
+        () => {
+            dispatch(initializeUsers());
+        },
+    ];
+};
+
+export const useCurrentUser = () => {
+    const dispatch = useDispatch();
+    const { current } = useSelector((state) => state.users);
+
+    useEffect(() => {
+        blogService.setToken(current ? current.token : null);
+    }, [current]);
+
+    return [
+        current,
         {
-            init() {
-                dispatch(initializeUser());
+            logout() {
+                dispatch(removeCurrent());
             },
             async login(name, pass) {
                 await dispatch(loginUser(name, pass));
-            },
-            logout() {
-                dispatch(logoutUser());
             },
         },
     ];

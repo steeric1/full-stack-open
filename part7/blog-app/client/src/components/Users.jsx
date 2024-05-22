@@ -1,16 +1,11 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import userService from "../services/users";
+import { useUsers } from "../hooks";
 
 const Users = () => {
-    const [users, setUsers] = useState([]);
-
-    useEffect(() => {
-        (async () => {
-            const users = await userService.getAll();
-            setUsers(users);
-        })();
-    });
+    const [users] = useUsers();
 
     return (
         <>
@@ -23,7 +18,11 @@ const Users = () => {
                     </tr>
                     {users.map((user) => (
                         <tr key={user.id}>
-                            <td>{user.name}</td>
+                            <td>
+                                <Link to={`/users/${user.id}`}>
+                                    {user.name}
+                                </Link>
+                            </td>
                             <td>{user.blogs.length}</td>
                         </tr>
                     ))}
