@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 
 import userService from "../services/users";
 import { useUsers } from "../hooks";
+import Link from "./ui/Link";
 
 const Users = () => {
     const [users] = useUsers();
@@ -14,7 +14,7 @@ const Users = () => {
                 <tbody>
                     <tr>
                         <th></th>
-                        <th>blogs created</th>
+                        <th>Blogs added</th>
                     </tr>
                     {users.map((user) => (
                         <tr key={user.id}>

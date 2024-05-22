@@ -1,4 +1,10 @@
 
+html {
+    font-family: system-ui, sans-serif;
+    font-weight: normal;
+    background-color: snow;
+}
+
 .notification {
     padding: 10px 25px;
     margin: 10px 10px 20px;

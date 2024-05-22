@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 
 import { useUsers } from "../hooks";
+import Link from "./ui/Link";
+import BlogWrapper from "./ui/BlogWrapper";
 
 const User = () => {
     const [users] = useUsers();
@@ -19,12 +21,14 @@ const User = () => {
     return (
         <div>
             <h2>{user.name}</h2>
-            <h3>added blogs</h3>
-            <ul>
-                {user.blogs.map((blog) => (
-                    <li key={blog.id}>{blog.title}</li>
-                ))}
-            </ul>
+            <h3>Added blogs</h3>
+            {user.blogs.map((blog) => (
+                <BlogWrapper key={blog.id}>
+                    <Link to={`/blogs/${blog.id}`}>
+                        {blog.title} {blog.author}
+                    </Link>
+                </BlogWrapper>
+            ))}
         </div>
     );
 };

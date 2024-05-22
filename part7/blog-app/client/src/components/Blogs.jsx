@@ -1,9 +1,11 @@
 import { useRef } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import styled from "styled-components";
 
 import Togglable from "./Togglable";
 import BlogForm from "./BlogForm";
+import Link from "./ui/Link";
+import BlogWrapper from "./ui/BlogWrapper";
 
 import { initializeBlogs, likeBlog, removeBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
@@ -13,17 +15,11 @@ const Blogs = () => {
     const blogs = useSelector((state) => state.blogs);
     const blogTogglerRef = useRef();
 
-    const wrapperStyle = {
-        border: "1px solid black",
-        borderRadius: 4,
-        padding: 4,
-        paddingLeft: 8,
-        marginBottom: 4,
-    };
-
     return (
         <>
-            <Togglable showButtonLabel="create new blog" ref={blogTogglerRef}>
+            <h2>Blogs</h2>
+
+            <Togglable showButtonLabel="Add new" ref={blogTogglerRef}>
                 <BlogForm
                     toggleVisibility={() =>
                         blogTogglerRef.current.toggleVisibility()
@@ -34,11 +30,11 @@ const Blogs = () => {
             <br />
 
             {blogs.map((blog) => (
-                <div key={blog.id} style={wrapperStyle}>
+                <BlogWrapper key={blog.id}>
                     <Link to={`/blogs/${blog.id}`}>
                         {blog.title} {blog.author}
                     </Link>
-                </div>
+                </BlogWrapper>
             ))}
         </>
     );
