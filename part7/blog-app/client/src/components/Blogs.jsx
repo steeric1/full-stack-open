@@ -1,10 +1,41 @@
-import { useDispatch } from "react-redux";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
-import { likeBlog, removeBlog } from "../reducers/blogReducer";
+import Togglable from "./Togglable";
+import BlogForm from "./BlogForm";
+
+import { initializeBlogs, likeBlog, removeBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
 import { useUser } from "../hooks";
+
+const Blogs = () => {
+    const blogs = useSelector((state) => state.blogs);
+    const dispatch = useDispatch();
+    const blogTogglerRef = useRef();
+
+    useEffect(() => {
+        dispatch(initializeBlogs());
+    }, []);
+
+    return (
+        <>
+            <Togglable showButtonLabel="create new blog" ref={blogTogglerRef}>
+                <BlogForm
+                    toggleVisibility={() =>
+                        blogTogglerRef.current.toggleVisibility()
+                    }
+                />
+            </Togglable>
+
+            <br />
+
+            {blogs.map((blog) => (
+                <Blog key={blog.id} blog={blog} />
+            ))}
+        </>
+    );
+};
 
 const Blog = ({ blog }) => {
     const dispatch = useDispatch();
@@ -88,4 +119,4 @@ Blog.propTypes = {
     blog: PropTypes.object.isRequired,
 };
 
-export default Blog;
+export default Blogs;
