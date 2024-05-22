@@ -5,16 +5,18 @@ import {
     forwardRef,
     useRef,
 } from "react";
+import { useDispatch } from "react-redux";
 
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Togglable";
+import Notification from "./components/Notification";
 
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
-import "./styles.css";
+import { setNotification } from "./reducers/notificationReducer";
 
 const User = ({ user, handleLogout }) => (
     <p>
@@ -22,24 +24,17 @@ const User = ({ user, handleLogout }) => (
     </p>
 );
 
-const Notification = ({ kind, message }) => (
-    <div className={`notification ${kind ?? ""}`}>{message}</div>
-);
-
 const App = () => {
     const [blogs, setBlogs] = useState([]);
     const [user, setUser] = useState(null);
-    const [notification, setNotification] = useState(null);
+    const dispatch = useDispatch();
+
+    const notify = (message, kind = "") =>
+        dispatch(setNotification(message, kind));
 
     useEffect(() => {
         blogService.setToken(user ? user.token : null);
     }, [user]);
-
-    useEffect(() => {
-        if (notification) {
-            setTimeout(() => setNotification(null), 4000);
-        }
-    }, [notification]);
 
     useEffect(() => {
         (async () => {
@@ -60,10 +55,7 @@ const App = () => {
             setUser(user);
             localStorage.setItem("loggedInUser", JSON.stringify(user));
         } catch (error) {
-            setNotification({
-                kind: "error",
-                message: "wrong username or password",
-            });
+            notify("wrong username or password", "error");
         }
     };
 
@@ -88,16 +80,13 @@ const App = () => {
                             const newBlog = await blogService.create(blog);
                             setBlogs([...blogs, newBlog]);
 
-                            setNotification({
-                                message: `new blog: ${blog.title} (by ${blog.author})`,
-                            });
+                            notify(
+                                `new blog: ${blog.title} (by ${blog.author})`,
+                            );
 
                             blogFormRef.current.toggleVisibility();
                         } catch (error) {
-                            setNotification({
-                                kind: "error",
-                                message: "failed to create blog",
-                            });
+                            notify("failed to create blog", "error");
                         }
                     }}
                 />
@@ -120,10 +109,7 @@ const App = () => {
                                     ),
                                 );
                             } catch (error) {
-                                setNotification({
-                                    kind: "error",
-                                    message: "failed to like blog",
-                                });
+                                notify("failed to like blog", "error");
                             }
                         }}
                         showRemove={
@@ -139,12 +125,9 @@ const App = () => {
                             try {
                                 await blogService.remove(blog);
                                 setBlogs(blogs.filter((b) => b.id !== blog.id));
-                                setNotification({ message: "removed blog" });
+                                notify("removed blog");
                             } catch (error) {
-                                setNotification({
-                                    kind: "error",
-                                    message: "failed to remove blog",
-                                });
+                                notify("failed to remove blog", "error");
                             }
                         }}
                     />
@@ -156,7 +139,7 @@ const App = () => {
 
     return (
         <>
-            {notification && <Notification {...notification} />}
+            <Notification />
             {main}
         </>
     );
