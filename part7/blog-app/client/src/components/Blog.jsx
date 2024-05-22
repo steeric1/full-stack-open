@@ -46,13 +46,27 @@ const Blog = () => {
         <div>
             <h2>{blog.title}</h2>
             <section style={margin}>
-                <div>{blog.url}</div>
                 <div>
-                    <span>likes {blog.likes}</span>{" "}
-                    <button onClick={handleLike}>like</button>
+                    <div>
+                        <a href={blog.url}>{blog.url}</a>
+                    </div>
+                    <div>
+                        <span>likes {blog.likes}</span>{" "}
+                        <button onClick={handleLike}>like</button>
+                    </div>
+                    <div>{blog.user ? `Added by ${blog.user.name}` : ""}</div>
+                    {showRemove && (
+                        <button onClick={handleRemove}>remove</button>
+                    )}
                 </div>
-                <div>{blog.user ? `Added by ${blog.user.name}` : ""}</div>
-                {showRemove && <button onClick={handleRemove}>remove</button>}
+                <div>
+                    <h3>comments</h3>
+                    <ul>
+                        {blog.comments.map((comment) => (
+                            <li key={comment.id}>{comment.content}</li>
+                        ))}
+                    </ul>
+                </div>
             </section>
         </div>
     );
