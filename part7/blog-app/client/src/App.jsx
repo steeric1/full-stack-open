@@ -11,6 +11,7 @@ import User from "./components/User";
 
 import { useCurrentUser, useUsers } from "./hooks";
 import { initializeBlogs } from "./reducers/blogReducer";
+import NavMenu from "./components/NavMenu";
 
 const App = () => {
     const dispatch = useDispatch();
@@ -20,7 +21,7 @@ const App = () => {
         initializeUsers();
     }, []);
 
-    const [currentUser, { logout }] = useCurrentUser();
+    const [currentUser] = useCurrentUser();
     if (!currentUser) {
         return (
             <>
@@ -32,14 +33,11 @@ const App = () => {
 
     return (
         <>
+            <NavMenu />
+
             <Notification />
 
-            <h2>blogs</h2>
-
-            <p>
-                {currentUser.name} logged in{" "}
-                <button onClick={logout}>log out</button>
-            </p>
+            <h2>blog app</h2>
 
             <Routes>
                 <Route path="/" element={<Blogs />} />
