@@ -24,7 +24,7 @@ const parseArgs = (args: string[]): BmiInput => {
       `Incorrect number of arguments. Expected 2, got ${args.length}`
     );
 
-  let [height, weight] = asNumbers(args);
+  const [height, weight] = asNumbers(args);
 
   return {
     height,

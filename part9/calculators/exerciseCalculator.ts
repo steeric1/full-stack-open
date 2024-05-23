@@ -49,7 +49,7 @@ const calculateExercises = (
 const parseArgs = (args: string[]): TrainingInput => {
   if (args.length < 2) throw new Error('Missing arguments');
 
-  let [dailyTarget, ...hours] = asNumbers(args);
+  const [dailyTarget, ...hours] = asNumbers(args);
 
   return {
     dailyTarget,
