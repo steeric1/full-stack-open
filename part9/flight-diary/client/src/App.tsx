@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { Diary } from "./types";
-import { getAllDiaries } from "./diaryService";
+import { Diary, NewDiary } from "./types";
+import { createDiary as createNewDiary, getAllDiaries } from "./diaryService";
+
 import DiaryEntries from "./components/DiaryEntries";
+import DiaryForm from "./components/DiaryForm";
 
 const App = () => {
   const [diaries, setDiaries] = useState<Diary[]>([]);
@@ -11,7 +13,17 @@ const App = () => {
     getAllDiaries().then((diaries) => setDiaries(diaries));
   }, []);
 
-  return <DiaryEntries entries={diaries} />;
+  const createDiary = async (newDiary: NewDiary) => {
+    const diary = await createNewDiary(newDiary);
+    setDiaries(diaries.concat(diary));
+  };
+
+  return (
+    <>
+      <DiaryForm createDiary={createDiary} />
+      <DiaryEntries entries={diaries} />
+    </>
+  );
 };
 
 export default App;
