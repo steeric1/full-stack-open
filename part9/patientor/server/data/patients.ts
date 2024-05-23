@@ -45,9 +45,8 @@ const data = [
 ];
 
 const patients: Patient[] = data.map((obj) => {
-  const patient = toNewPatient(obj) as Patient;
-  patient.id = obj.id;
-  return patient;
+  const patient = toNewPatient(obj);
+  return { ...patient, id: obj.id };
 });
 
 export default patients;

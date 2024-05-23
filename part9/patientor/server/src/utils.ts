@@ -1,4 +1,10 @@
-import { Gender, NewPatient, NonSensitivePatient, Patient } from './types';
+import {
+  Entry,
+  Gender,
+  NewPatient,
+  NonSensitivePatient,
+  Patient,
+} from './types';
 
 export const toNonSensitivePatient = ({
   ssn: _,
@@ -24,12 +30,16 @@ export const toNewPatient = (object: unknown): NewPatient => {
     throw new Error('Invalid data: missing fields');
   }
 
+  let entries: Entry[] | undefined = undefined;
+  if ('entries' in object) entries = parseEntries(object.entries);
+
   return {
     name: parseString(object.name),
     dateOfBirth: parseDate(object.dateOfBirth),
     ssn: parseString(object.ssn),
     gender: parseGender(object.gender),
     occupation: parseString(object.occupation),
+    entries: entries ?? [],
   };
 };
 
@@ -64,4 +74,16 @@ export const isGender = (object: unknown): object is Gender => {
   return Object.values(Gender)
     .map((g) => g.toString())
     .includes(str);
+};
+
+export const parseEntries = (object: unknown): Entry[] => {
+  if (!Array.isArray(object)) {
+    throw new Error('Invalid entries');
+  }
+
+  return object.map((obj) => parseEntry(obj));
+};
+
+export const parseEntry = (_object: unknown): Entry => {
+  return {};
 };
