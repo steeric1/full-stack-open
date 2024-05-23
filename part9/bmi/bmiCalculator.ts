@@ -1,3 +1,10 @@
+import { asNumbers } from './utils';
+
+interface BmiInput {
+  height: number;
+  weight: number;
+}
+
 const calculateBmi = (height: number, weight: number) => {
   const bmi = weight / ((height * height) / (100 * 100));
   if (bmi < 18.5) {
@@ -11,4 +18,27 @@ const calculateBmi = (height: number, weight: number) => {
   }
 };
 
-console.log(calculateBmi(180, 74));
+const parseArgs = (args: string[]): BmiInput => {
+  if (args.length !== 2)
+    throw new Error(
+      `Incorrect number of arguments. Expected 2, got ${args.length}`
+    );
+
+  let [height, weight] = asNumbers(args);
+
+  return {
+    height,
+    weight,
+  };
+};
+
+try {
+  const { height, weight } = parseArgs(process.argv.slice(2));
+  console.log(calculateBmi(height, weight));
+} catch (error) {
+  let message = 'Something went wrong';
+  if (error instanceof Error) {
+    message += ` Error: ${error.message}`;
+  }
+  console.error(message);
+}

@@ -1,3 +1,10 @@
+import { asNumbers } from './utils';
+
+interface TrainingInput {
+  hours: number[];
+  dailyTarget: number;
+}
+
 interface TrainingData {
   periodLength: number;
   trainingDays: number;
@@ -39,4 +46,24 @@ const calculateExercises = (
   };
 };
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+const parseArgs = (args: string[]): TrainingInput => {
+  if (args.length < 2) throw new Error('Missing arguments');
+
+  let [dailyTarget, ...hours] = asNumbers(args);
+
+  return {
+    dailyTarget,
+    hours,
+  };
+};
+
+try {
+  const { hours, dailyTarget } = parseArgs(process.argv.slice(2));
+  console.log(calculateExercises(hours, dailyTarget));
+} catch (error) {
+  let message = 'Something went wrong';
+  if (error instanceof Error) {
+    message += ` Error: ${error.message}`;
+  }
+  console.error(message);
+}
