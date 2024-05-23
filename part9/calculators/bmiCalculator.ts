@@ -32,13 +32,15 @@ const parseArgs = (args: string[]): BmiInput => {
   };
 };
 
-try {
-  const { height, weight } = parseArgs(process.argv.slice(2));
-  console.log(calculateBmi(height, weight));
-} catch (error) {
-  let message = 'Something went wrong';
-  if (error instanceof Error) {
-    message += ` Error: ${error.message}`;
+if (require.main === module) {
+  try {
+    const { height, weight } = parseArgs(process.argv.slice(2));
+    console.log(calculateBmi(height, weight));
+  } catch (error) {
+    let message = 'Something went wrong';
+    if (error instanceof Error) {
+      message += ` Error: ${error.message}`;
+    }
+    console.error(message);
   }
-  console.error(message);
 }

@@ -15,7 +15,7 @@ interface TrainingData {
   average: number;
 }
 
-const calculateExercises = (
+export const calculateExercises = (
   hours: number[],
   dailyTarget: number
 ): TrainingData => {
@@ -57,13 +57,15 @@ const parseArgs = (args: string[]): TrainingInput => {
   };
 };
 
-try {
-  const { hours, dailyTarget } = parseArgs(process.argv.slice(2));
-  console.log(calculateExercises(hours, dailyTarget));
-} catch (error) {
-  let message = 'Something went wrong';
-  if (error instanceof Error) {
-    message += ` Error: ${error.message}`;
+if (require.main === module) {
+  try {
+    const { hours, dailyTarget } = parseArgs(process.argv.slice(2));
+    console.log(calculateExercises(hours, dailyTarget));
+  } catch (error) {
+    let message = 'Something went wrong';
+    if (error instanceof Error) {
+      message += ` Error: ${error.message}`;
+    }
+    console.error(message);
   }
-  console.error(message);
 }
