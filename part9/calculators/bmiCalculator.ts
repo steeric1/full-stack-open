@@ -5,7 +5,7 @@ interface BmiInput {
   weight: number;
 }
 
-const calculateBmi = (height: number, weight: number) => {
+export const calculateBmi = (height: number, weight: number) => {
   const bmi = weight / ((height * height) / (100 * 100));
   if (bmi < 18.5) {
     return 'Underweight';
