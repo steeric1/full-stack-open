@@ -10,20 +10,28 @@ const DiaryForm = ({ createDiary }: DiaryFormProps) => {
   const [visibility, setVisibility] = useState("");
   const [weather, setWeather] = useState("");
   const [comment, setComment] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
-    await createDiary({
-      date,
-      visibility,
-      weather,
-      comment,
-    });
+    try {
+      await createDiary({
+        date,
+        visibility,
+        weather,
+        comment,
+      });
 
-    setDate("");
-    setVisibility("");
-    setWeather("");
-    setComment("");
+      setDate("");
+      setVisibility("");
+      setWeather("");
+      setComment("");
+      setError(null);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      }
+    }
   };
 
   const lineByLine = {
@@ -35,6 +43,7 @@ const DiaryForm = ({ createDiary }: DiaryFormProps) => {
   return (
     <div>
       <h3>Add new entry</h3>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit} style={lineByLine}>
         <label htmlFor="date">
           date{" "}
