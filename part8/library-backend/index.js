@@ -154,7 +154,7 @@ const resolvers = {
     },
     Mutation: {
         addBook(_root, args) {
-            if (!authors.includes(args.author)) {
+            if (!authors.some((author) => author.name === args.author)) {
                 authors.push({
                     name: args.author,
                     id: uuid(),
