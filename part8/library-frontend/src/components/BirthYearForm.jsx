@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const BirthYearForm = ({ handleSet }) => {
+const BirthYearForm = ({ authors, handleSet }) => {
     const [name, setName] = useState("");
     const [born, setBorn] = useState("");
     const [error, setError] = useState("");
@@ -24,17 +24,23 @@ const BirthYearForm = ({ handleSet }) => {
             <h3>set birthyear</h3>
             <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>
             <form onSubmit={handleSubmit}>
-                <label htmlFor="name">
+                <label>
                     name{" "}
-                    <input
-                        id="name"
+                    <select
                         value={name}
                         onChange={({ target }) => setName(target.value)}
                         required
-                    />
+                    >
+                        <option value="">-</option>
+                        {authors.map((a) => (
+                            <option key={a.id} value={a.name}>
+                                {a.name}
+                            </option>
+                        ))}
+                    </select>
                 </label>
                 <br />
-                <label htmlFor="born">
+                <label>
                     born{" "}
                     <input
                         type="number"
