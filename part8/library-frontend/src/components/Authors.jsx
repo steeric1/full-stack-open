@@ -1,9 +1,13 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
-import { ALL_AUTHORS } from "../queries";
+import { ALL_AUTHORS, EDIT_AUTHOR } from "../queries";
+import BirthYearForm from "./BirthYearForm";
 
 const Authors = (props) => {
     const { loading, data } = useQuery(ALL_AUTHORS);
+    const [editAuthor] = useMutation(EDIT_AUTHOR, {
+        refetchQueries: [{ query: ALL_AUTHORS }],
+    });
 
     if (!props.show) {
         return null;
@@ -11,6 +15,14 @@ const Authors = (props) => {
 
     if (loading) return <div>loading...</div>;
     const { allAuthors: authors } = data;
+
+    const handleSetBirthYear = async (name, year) => {
+        const { data } = await editAuthor({
+            variables: { name, setBornTo: Number(year) },
+        });
+
+        if (!data.editAuthor) throw new Error("no author found");
+    };
 
     return (
         <div>
@@ -31,6 +43,8 @@ const Authors = (props) => {
                     ))}
                 </tbody>
             </table>
+
+            <BirthYearForm handleSet={handleSetBirthYear} />
         </div>
     );
 };
