@@ -84,6 +84,26 @@ export const parseEntries = (object: unknown): Entry[] => {
   return object.map((obj) => parseEntry(obj));
 };
 
-export const parseEntry = (_object: unknown): Entry => {
-  return {};
+export const parseEntry = (object: unknown): Entry => {
+  if (!object || typeof object !== 'object') {
+    throw new Error('Invalid entry');
+  }
+
+  if (!('type' in object)) {
+    throw new Error('Invalid entry, missing type');
+  }
+
+  const type = parseString(object.type);
+  if (
+    !(
+      type === 'HealthCheck' ||
+      type === 'OccupationalHealthcare' ||
+      type === 'Hospital'
+    )
+  ) {
+    throw new Error(`Invalid entry type: '${type}'`);
+  }
+
+  // For now, do no other validation
+  return object as Entry;
 };
