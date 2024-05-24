@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { Diagnosis as DiagnosisData } from "../../types";
+import { Diagnosis } from "../../types";
 import diagnosisService from "../../services/diagnoses";
 
 interface Props {
-  code: DiagnosisData["code"];
+  code: Diagnosis["code"];
 }
 
-const Diagnosis = ({ code }: Props) => {
+const DiagnosisDetails = ({ code }: Props) => {
   const [name, setName] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -23,4 +23,4 @@ const Diagnosis = ({ code }: Props) => {
   );
 };
 
-export default Diagnosis;
+export default DiagnosisDetails;

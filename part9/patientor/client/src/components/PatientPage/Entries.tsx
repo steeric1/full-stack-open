@@ -7,13 +7,17 @@ import {
   Typography,
 } from "@mui/material";
 import { Entry } from "../../types";
-import Diagnosis from "./Diagnosis";
+import EntryRow from "./EntryRow";
 
 interface Props {
   entries: Entry[];
 }
 
 const Entries = ({ entries }: Props) => {
+  const displayHealth = entries.some((entry) => entry.type === "HealthCheck");
+  const displayInfo = entries.some(
+    (entry) => "discharge" in entry || "sickLeave" in entry
+  );
   return (
     <div>
       <Typography
@@ -23,45 +27,50 @@ const Entries = ({ entries }: Props) => {
         Entries
       </Typography>
       {entries.length === 0 ? (
-        <Typography>
-          <em>No entries.</em>
-        </Typography>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <em>This patient has no entries.</em>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       ) : (
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell />
               <TableCell>
                 <strong>Date</strong>
               </TableCell>
               <TableCell>
                 <strong>Description</strong>
               </TableCell>
+              {displayHealth && (
+                <TableCell>
+                  <strong>Health</strong>
+                </TableCell>
+              )}
               <TableCell>
                 <strong>Diagnoses</strong>
               </TableCell>
+              <TableCell>
+                <strong>Specialist</strong>
+              </TableCell>
+              {displayInfo && (
+                <TableCell>
+                  <strong>Information</strong>
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
             {entries.map((entry) => (
-              <TableRow key={entry.id}>
-                <TableCell>
-                  {new Date(entry.date).toLocaleDateString()}
-                </TableCell>
-                <TableCell>{entry.description}</TableCell>
-                <TableCell>
-                  {entry.diagnosisCodes ? (
-                    <ul style={{ margin: 0, paddingLeft: "20px" }}>
-                      {entry.diagnosisCodes.map((code) => (
-                        <li key={code}>
-                          <Diagnosis code={code} />
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <em>none</em>
-                  )}
-                </TableCell>
-              </TableRow>
+              <EntryRow
+                key={entry.id}
+                {...{ entry, displayHealth, displayInfo }}
+              />
             ))}
           </TableBody>
         </Table>
