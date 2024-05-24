@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Entry } from "../../types";
+import Diagnosis from "./Diagnosis";
 
 interface Props {
   entries: Entry[];
@@ -51,7 +52,9 @@ const Entries = ({ entries }: Props) => {
                   {entry.diagnosisCodes ? (
                     <ul style={{ margin: 0, paddingLeft: "20px" }}>
                       {entry.diagnosisCodes.map((code) => (
-                        <li key={code}>{code}</li>
+                        <li key={code}>
+                          <Diagnosis code={code} />
+                        </li>
                       ))}
                     </ul>
                   ) : (
