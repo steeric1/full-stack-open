@@ -3,13 +3,13 @@ import { useMutation, useQuery } from "@apollo/client";
 import { ALL_AUTHORS, EDIT_AUTHOR } from "../queries";
 import BirthYearForm from "./BirthYearForm";
 
-const Authors = (props) => {
+const Authors = ({ show, showForm }) => {
     const { loading, data } = useQuery(ALL_AUTHORS);
     const [editAuthor] = useMutation(EDIT_AUTHOR, {
         refetchQueries: [{ query: ALL_AUTHORS }],
     });
 
-    if (!props.show) {
+    if (!show) {
         return null;
     }
 
@@ -44,7 +44,12 @@ const Authors = (props) => {
                 </tbody>
             </table>
 
-            <BirthYearForm authors={authors} handleSet={handleSetBirthYear} />
+            {showForm && (
+                <BirthYearForm
+                    authors={authors}
+                    handleSet={handleSetBirthYear}
+                />
+            )}
         </div>
     );
 };
