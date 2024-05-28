@@ -3,20 +3,41 @@ import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
-import { useApolloClient } from "@apollo/client";
+import { useApolloClient, useSubscription } from "@apollo/client";
 import Recommend from "./components/Recommend";
+import { BOOK_ADDED } from "./queries";
 
 const App = () => {
     const [page, setPage] = useState("authors");
+    const [notification, setNotification] = useState("");
     const [token, setToken] = useState(
         localStorage.getItem("libraryUserToken")
     );
 
     const client = useApolloClient();
 
+    useEffect(() => setPage("authors"), [token]);
+
     useEffect(() => {
-        setPage("authors");
-    }, [token]);
+        if (notification) {
+            const timeout = setTimeout(() => setNotification(""), 5000);
+
+            return () => clearTimeout(timeout);
+        }
+    }, [notification]);
+
+    useSubscription(BOOK_ADDED, {
+        async onData({ data: { data } }) {
+            setNotification(`A new book was added: ${data.bookAdded.title}`);
+
+            await client.refetchQueries({
+                updateCache(cache) {
+                    cache.evict({ fieldName: "allBooks" });
+                    cache.evict({ fieldName: "allAuthors" });
+                },
+            });
+        },
+    });
 
     const logout = () => {
         setToken(null);
@@ -42,6 +63,8 @@ const App = () => {
                     <button onClick={() => setPage("login")}>log in</button>
                 )}
             </div>
+
+            {notification && <p>{notification}</p>}
 
             <Authors show={page === "authors"} showForm={!!token} />
             <Books show={page === "books"} />
