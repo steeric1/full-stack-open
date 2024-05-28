@@ -1,23 +1,34 @@
 import { useState, useEffect } from "react";
-import { useMutation } from "@apollo/client";
-import { LOGIN } from "../queries";
+import { useApolloClient, useMutation } from "@apollo/client";
+
+import { LOGIN, ME } from "../queries";
 
 const LoginForm = ({ show, setToken }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const client = useApolloClient();
 
     const [login, { data }] = useMutation(LOGIN, {
         onError: (error) => setError(error.graphQLErrors[0].message),
     });
 
     useEffect(() => {
-        if (data) {
-            setError("");
-            const token = data.login.value;
-            setToken(token);
-            localStorage.setItem("libraryUserToken", token);
-        }
+        const handleData = async () => {
+            if (data) {
+                setUsername("");
+                setPassword("");
+                setError("");
+
+                const token = data.login.value;
+                setToken(token);
+                localStorage.setItem("libraryUserToken", token);
+
+                await client.refetchQueries({ include: [ME] });
+            }
+        };
+
+        handleData();
     }, [data]);
 
     if (!show) return null;
